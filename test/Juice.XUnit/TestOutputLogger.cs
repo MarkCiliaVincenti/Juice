@@ -139,8 +139,8 @@ namespace Microsoft.Extensions.Logging
                     for (var j = scopes.Count - 1; j >= i; j--)
                     {
                         _output.WriteLine("{0}   End: {1}", new string('-', (j + 1) * 4), scopes[j]);
-                        _output.WriteLine("");
                     }
+                    _output.WriteLine("");
                     break;
                 }
                 if (scopes[i] != newScopes[i])
@@ -149,7 +149,6 @@ namespace Microsoft.Extensions.Logging
                     for (var j = scopes.Count - 1; j >= i; j--)
                     {
                         _output.WriteLine("{0}   End: {1}", new string('-', (j + 1) * 4), scopes[j]);
-                        _output.WriteLine("");
                     }
                     _output.WriteLine("");
                     return;

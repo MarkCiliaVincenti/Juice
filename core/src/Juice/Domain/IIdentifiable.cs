@@ -4,6 +4,6 @@
     {
         TKey Id { get; }
         public string Name { get; }
-        public bool Disabled { get; }
+        //public bool Disabled { get; }
     }
 }

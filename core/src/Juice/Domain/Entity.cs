@@ -32,7 +32,8 @@ namespace Juice.Domain
         }
     }
 
-    public abstract class AuditEntity<TKey> : Entity<TKey>, IAuditable where TKey : IEquatable<TKey>
+    public abstract class AuditEntity<TKey> : Entity<TKey>, IAuditable, ICreationInfo, IModificationInfo
+        where TKey : IEquatable<TKey>
     {
         public string? CreatedUser { get; protected set; }
         public string? ModifiedUser { get; protected set; }
@@ -40,7 +41,7 @@ namespace Juice.Domain
         public DateTimeOffset? ModifiedDate { get; protected set; }
     }
 
-    public abstract class DynamicAuditEntity<TKey> : DynamicEntity<TKey>, IAuditable, IIdentifiable<TKey>
+    public abstract class DynamicAuditEntity<TKey> : DynamicEntity<TKey>, IAuditable, IIdentifiable<TKey>, ICreationInfo, IModificationInfo
         where TKey : IEquatable<TKey>
     {
         #region Auditable

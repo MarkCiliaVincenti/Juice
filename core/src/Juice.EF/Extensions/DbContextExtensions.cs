@@ -28,14 +28,19 @@ namespace Juice.EF.Extensions
 
                 addedEntities.ForEach(entry =>
                 {
-                    if (user != null && entry.Property(nameof(IAuditable.CreatedUser)).CurrentValue == null)
+                    if(entry.Entity is ICreationInfo)
                     {
-                        entry.Property(nameof(IAuditable.CreatedUser)).CurrentValue = user;
+                        if (user != null && entry.Property(nameof(ICreationInfo.CreatedUser)).CurrentValue == null)
+                        {
+                            entry.Property(nameof(ICreationInfo.CreatedUser)).CurrentValue = user;
+                        }
+                        entry.Property(nameof(ICreationInfo.CreatedDate)).CurrentValue = DateTimeOffset.Now;
                     }
-                    entry.Property(nameof(IAuditable.CreatedDate)).CurrentValue = DateTimeOffset.Now;
-
-                    entry.Property(nameof(IAuditable.ModifiedUser)).CurrentValue = user;
-                    entry.Property(nameof(IAuditable.ModifiedDate)).CurrentValue = DateTimeOffset.Now;
+                    if(entry.Entity is IModificationInfo)
+                    {
+                        entry.Property(nameof(IModificationInfo.ModifiedUser)).CurrentValue = user;
+                        entry.Property(nameof(IModificationInfo.ModifiedDate)).CurrentValue = DateTimeOffset.Now;
+                    }
 
                     if (logger?.IsEnabled(LogLevel.Debug) ?? false)
                     {
@@ -53,10 +58,16 @@ namespace Juice.EF.Extensions
                 }
                 editedEntities.ForEach(entry =>
                 {
-                    entry.Property(nameof(IAuditable.CreatedDate)).IsModified = false;
-                    entry.Property(nameof(IAuditable.CreatedUser)).IsModified = false;
-                    entry.Property(nameof(IAuditable.ModifiedDate)).CurrentValue = DateTimeOffset.Now;
-                    entry.Property(nameof(IAuditable.ModifiedUser)).CurrentValue = user;
+                    if(entry.Entity is IModificationInfo)
+                    {
+                        entry.Property(nameof(IModificationInfo.ModifiedUser)).CurrentValue = user;
+                        entry.Property(nameof(IModificationInfo.ModifiedDate)).CurrentValue = DateTimeOffset.Now;
+                    }
+                    if(entry.Entity is ICreationInfo)
+                    {
+                        entry.Property(nameof(ICreationInfo.CreatedDate)).IsModified = false;
+                        entry.Property(nameof(ICreationInfo.CreatedUser)).IsModified = false;
+                    }
                     if (logger?.IsEnabled(LogLevel.Debug) ?? false)
                     {
                         logger.LogDebug("[Audit] Setted audit info for entry {entryId}", entry.Property("Id").CurrentValue ?? "");
@@ -149,10 +160,10 @@ namespace Juice.EF.Extensions
                                     if ((property.CurrentValue == null && property.OriginalValue == null)
                                         || (property.CurrentValue != null && property.OriginalValue != null
                                         && property.CurrentValue.Equals(property.OriginalValue))
-                                        || property.Metadata.Name == nameof(IAuditable.CreatedDate)
-                                        || property.Metadata.Name == nameof(IAuditable.CreatedUser)
-                                        || property.Metadata.Name == nameof(IAuditable.ModifiedDate)
-                                        || property.Metadata.Name == nameof(IAuditable.ModifiedUser)
+                                        || property.Metadata.Name == nameof(ICreationInfo.CreatedDate)
+                                        || property.Metadata.Name == nameof(ICreationInfo.CreatedUser)
+                                        || property.Metadata.Name == nameof(IModificationInfo.ModifiedDate)
+                                        || property.Metadata.Name == nameof(IModificationInfo.ModifiedUser)
                                         )
                                     {
                                         break;
