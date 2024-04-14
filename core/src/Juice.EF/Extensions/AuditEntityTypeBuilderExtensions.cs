@@ -50,10 +50,10 @@ namespace Juice.EF.Extensions
         {
             try
             {
-                builder.Property<string?>(nameof(IAuditable.CreatedUser)).HasMaxLength(Constants.NameLength);
-                builder.Property<string?>(nameof(IAuditable.ModifiedUser)).HasMaxLength(Constants.NameLength);
-                builder.Property<DateTimeOffset>(nameof(IAuditable.CreatedDate)).IsRequired();
-                builder.Property<DateTimeOffset?>(nameof(IAuditable.ModifiedDate));
+                builder.Property<string?>(nameof(ICreationInfo.CreatedUser)).HasMaxLength(Constants.NameLength);
+                builder.Property<string?>(nameof(IModificationInfo.ModifiedUser)).HasMaxLength(Constants.NameLength);
+                builder.Property<DateTimeOffset>(nameof(ICreationInfo.CreatedDate)).IsRequired();
+                builder.Property<DateTimeOffset?>(nameof(IModificationInfo.ModifiedDate));
                 builder.HasAnnotation(Constants.AuditAnnotationName, true);
             }
             catch (Exception ex)
