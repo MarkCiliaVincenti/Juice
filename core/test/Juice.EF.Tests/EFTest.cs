@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Juice.Domain;
 using Juice.EF.Tests.Domain;
 using Juice.EF.Tests.EventHandlers;
 using Juice.EF.Tests.Infrastructure;
@@ -8,6 +9,7 @@ using Juice.EF.Tests.Migrations;
 using Juice.Extensions.DependencyInjection;
 using Juice.Services;
 using Juice.XUnit;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,7 +54,7 @@ namespace Juice.EF.Tests
 
                 services.AddMediatR(options =>
                 {
-                    options.RegisterServicesFromAssemblyContaining<DataEventHandler>();
+                    options.RegisterServicesFromAssemblyContaining(typeof(DataEventHandler<>));
                 });
 
                 services.AddDefaultStringIdGenerator();
@@ -164,5 +166,16 @@ namespace Juice.EF.Tests
             Assert.Equal("New value", addedContent[property]);
         }
 
+        [Fact(DisplayName = "Data event handle"), TestPriority(1)]
+        public async Task DataEvent_should_be_handle_Async()
+        {
+            var mediator = _serviceProvider.GetRequiredService<IMediator>();
+            var dataEvent = DataEvents.Inserted.Create(typeof(TestEntity), new AuditRecord("TestTable"));
+
+            await mediator.Publish(dataEvent).ConfigureAwait(false);
+            await Task.Delay(1000);
+        }
     }
+
+    internal class TestEntity { }
 }
