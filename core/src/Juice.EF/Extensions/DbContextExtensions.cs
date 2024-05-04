@@ -100,18 +100,17 @@ namespace Juice.EF.Extensions
                         continue;
                     }
 
-                    var auditEntry = new AuditEntry(entry)
-                    {
-                        Table = entry.Metadata?.GetTableName() ?? entry.Entity.GetType().Name,
-                        Database = context.Database.GetDbConnection().Database,
-                        Schema = entry.Metadata?.GetSchema(),
-                        User = user,
-                        DataEvent = entry.State == EntityState.Added ? DataEvents.Inserted
+                    var auditEntry = new AuditEntry(entry, entry.Metadata?.GetTableName(),
+                        entry.State == EntityState.Added ? DataEvents.Inserted
                         : entry.State == EntityState.Deleted ? DataEvents.Deleted
                         : entry.State == EntityState.Modified ? DataEvents.Modified
-                        : null
+                        : null)
+                    {
+                        Database = context.Database.GetDbConnection().Database,
+                        Schema = entry.Metadata?.GetSchema(),
+                        User = user
                     };
-                    if (auditEntry.DataEvent == null) { continue; }
+                    if (!auditEntry.HasDataEvent) { continue; }
 
                     auditEntries.Add(auditEntry);
 

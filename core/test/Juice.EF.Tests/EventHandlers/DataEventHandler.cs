@@ -1,5 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+using Juice.Domain;
 using Juice.EF.Tests.Domain;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -7,14 +8,15 @@ using Newtonsoft.Json;
 
 namespace Juice.EF.Tests.EventHandlers
 {
-    public class DataEventHandler : INotificationHandler<DataEvent>
+    public class DataEventHandler<T> : INotificationHandler<T>
+        where T : DataEvent
     {
         private readonly ILogger _logger;
-        public DataEventHandler(ILogger<DataEventHandler> logger)
+        public DataEventHandler(ILogger<DataEventHandler<T>> logger)
         {
             _logger = logger;
         }
-        public Task Handle(DataEvent dataEvent, CancellationToken token)
+        public Task Handle(T dataEvent, CancellationToken token)
         {
             _logger.LogInformation("DataEvent:" + JsonConvert.SerializeObject(dataEvent));
             if (dataEvent?.AuditRecord?.Entity is Content content)

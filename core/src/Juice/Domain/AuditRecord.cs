@@ -1,7 +1,11 @@
-﻿namespace Juice.EF
+﻿namespace Juice.Domain
 {
     public record AuditRecord
     {
+        public AuditRecord(string table)
+        {
+            Table = table;
+        }
         public object? Entity { get; init; }
         public string? User { get; init; }
         public string? Database { get; init; }
