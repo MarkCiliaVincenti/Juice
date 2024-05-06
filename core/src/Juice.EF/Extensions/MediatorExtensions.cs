@@ -53,7 +53,7 @@ namespace Juice.EF.Extensions
                         if (auditEntry.HasDataEvent && mediator != null)
                         {
                             // Save the Audit entry
-                            await mediator.Publish(auditEntry.DataEvent!);
+                            await mediator.Publish(auditEntry.DataEvent(ctx.EventType)!);
                         }
                     }
                     ctx.PendingAuditEntries.Clear();

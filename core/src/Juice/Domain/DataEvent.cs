@@ -24,12 +24,6 @@ namespace Juice.Domain
         public DataEvent(string name) : base(name)
         {
         }
-
-        public override DataEvent<T> SetAuditRecord(AuditRecord record)
-        {
-            AuditRecord = record;
-            return this;
-        }
     }
 
     public static class DataEvents
@@ -41,13 +35,13 @@ namespace Juice.Domain
 
     public static class DataEventExtensions
     {
-        public static DataEvent Create(this DataEvent dataEvent, Type? entityType, AuditRecord record)
+        public static DataEvent Create(this DataEvent dataEvent, Type eventType, Type? entityType, AuditRecord record)
         {
-            if(entityType == null)
+            if(eventType.IsGenericType && entityType != null)
             {
-                return new DataEvent(dataEvent.Name).SetAuditRecord(record);
+                eventType = eventType.MakeGenericType(entityType);
             }
-            var constructor = typeof(DataEvent<>).MakeGenericType(entityType).GetConstructor(new[] { typeof(string) });
+            var constructor = eventType.GetConstructor(new[] { typeof(string) });
             return ((DataEvent)constructor!.Invoke(new object[] { dataEvent.Name })).SetAuditRecord(record);
         }
     }
