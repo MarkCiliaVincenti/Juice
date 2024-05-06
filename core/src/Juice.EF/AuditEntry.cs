@@ -20,7 +20,8 @@ namespace Juice.EF
         /// <summary>
         /// Get data event of the audit entry
         /// </summary>
-        public DataEvent? DataEvent => _dataEvent!=null ? _dataEvent.Create(Entity?.GetType(), CreateRecord()) : null;
+        public DataEvent? DataEvent(Type eventType)
+            => _dataEvent!=null ? _dataEvent.Create(eventType, Entity?.GetType(), CreateRecord()) : null;
         public bool HasDataEvent => _dataEvent != null;
         public string? User { get; set; }
         public string? Database { get; set; }

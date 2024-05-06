@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Juice.Domain;
 using Juice.EF.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +10,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Juice.EF
 {
-    public abstract partial class DbContextBase : UnitOfWork,
+
+    public abstract partial class DbContextBase: UnitOfWork,
         ISchemaDbContext, IAuditableDbContext
     {
         #region Schema context
@@ -17,6 +19,7 @@ namespace Juice.EF
         #endregion
 
         #region Auditable context
+        public virtual Type EventType => typeof(DataEvent<>);
         public string? User { get; protected set; }
 
         public List<AuditEntry>? PendingAuditEntries { get; protected set; }
