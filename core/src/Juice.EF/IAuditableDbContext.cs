@@ -2,7 +2,10 @@
 {
     public interface IAuditableDbContext
     {
-        Type EventType { get; }
+        /// <summary>
+        /// Type of the event to be published, leave null if you don't want to publish any event
+        /// </summary>
+        Type? EventType { get; }
 
         List<AuditEntry>? PendingAuditEntries { get; }
 

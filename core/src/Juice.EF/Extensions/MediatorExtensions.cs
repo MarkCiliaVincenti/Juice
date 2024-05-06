@@ -50,7 +50,7 @@ namespace Juice.EF.Extensions
                                 auditEntry.CurrentValues[prop.Metadata.Name] = prop.CurrentValue;
                             }
                         }
-                        if (auditEntry.HasDataEvent && mediator != null)
+                        if (auditEntry.HasDataEvent && mediator != null && ctx.EventType!=null)
                         {
                             // Save the Audit entry
                             await mediator.Publish(auditEntry.DataEvent(ctx.EventType)!);
