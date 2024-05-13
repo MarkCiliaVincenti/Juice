@@ -7,9 +7,12 @@ namespace Juice.EventBus
     /// <summary>
     /// Local event bus throught memory
     /// </summary>
-    public class InMemoryEventBus : EventBusBase
+    public class InMemoryEventBus : EventBusBase, IDisposable
     {
         private readonly IServiceScopeFactory _scopeFactory;
+        private List<Task> _tasks = new List<Task>();
+        private bool _disposedValue;
+
         public InMemoryEventBus(IEventBusSubscriptionsManager subscriptionsManager,
             IServiceScopeFactory scopeFactory,
             ILogger<InMemoryEventBus> logger) : base(subscriptionsManager, logger)
@@ -36,11 +39,42 @@ namespace Juice.EventBus
                     var handler = scope.ServiceProvider.GetService(subscription.HandlerType);
                     if (handler == null) { continue; }
                     var eventType = SubsManager.GetEventTypeByName(eventName);
-
+                    var handlerName = handler.GetType().Name;
                     try
                     {
                         var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
-                        concreteType.GetMethod("HandleAsync").Invoke(handler, new object[] { @event });
+                        // It worked but not sure if it's the best way to do it
+                        var _task = (Task)concreteType.GetMethod("HandleAsync").Invoke(handler, new object[] { @event });
+                        _task!.ContinueWith(task =>
+                             {
+                                if (task.IsFaulted)
+                                 {
+                                    Logger.LogError(task.Exception, "Error handling integration event: {EventName}, {Message}", eventName, task.Exception?.Message);
+                                 }
+                                 else // remove task from tasks list
+                                 {
+                                     lock (_tasks)
+                                     {
+                                         var managedTask = _tasks.FirstOrDefault(t => t.Id == task.Id);
+                                         if(managedTask!=null)
+                                         {
+                                             _tasks.Remove(managedTask);
+                                         }
+                                         else
+                                         {
+                                         }
+                                     }
+                                     if(Logger.IsEnabled(LogLevel.Debug))
+                                     {
+                                         Logger.LogDebug("Integration event handled: {EventName}, by {HandlerName}", eventName, handlerName);
+                                     }
+                                 }
+                            })
+                            ;
+                        lock (_tasks)
+                        {
+                            _tasks.Add(_task);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -54,5 +88,38 @@ namespace Juice.EventBus
             }
         }
 
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects)
+                    lock (_tasks)
+                    {
+                        Task.WhenAll(_tasks).GetAwaiter().GetResult();
+                    }
+                    _tasks.Clear();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                _disposedValue = true;
+            }
+        }
+
+        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~InMemoryEventBus()
+        // {
+        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 }
