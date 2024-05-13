@@ -52,7 +52,7 @@ namespace Juice.EventBus.Tests
                 services.RegisterRabbitMQEventBus(configuration.GetSection("RabbitMQ"));
 
                 services.AddTransient<ContentPublishedIntegrationEventHandler>();
-
+                services.AddSingleton<HandledService>();
             });
 
             var serviceProvider = resolver.ServiceProvider;

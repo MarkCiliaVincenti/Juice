@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Juice.EventBus.Tests.Events;
 using Juice.EventBus.Tests.Handlers;
 using Juice.Extensions.DependencyInjection;
@@ -29,6 +30,7 @@ namespace Juice.EventBus.Tests
                 var configuration = configService.GetConfiguration();
 
                 services.AddSingleton(provider => testOutput);
+                services.AddSingleton<HandledService>();
 
                 services.AddLogging(builder =>
                 {
@@ -40,6 +42,8 @@ namespace Juice.EventBus.Tests
                 services.RegisterInMemoryEventBus();
 
                 services.AddTransient<ContentPublishedIntegrationEventHandler>();
+
+                services.AddSingleton<HandledService>();
             });
 
             _serviceProvider = resolver.ServiceProvider;
@@ -52,11 +56,14 @@ namespace Juice.EventBus.Tests
             var eventBus = _serviceProvider.GetService<IEventBus>();
             if (eventBus != null)
             {
+                var handledService = _serviceProvider.GetRequiredService<HandledService>();
+
                 eventBus.Subscribe<ContentPublishedIntegrationEvent, ContentPublishedIntegrationEventHandler>();
 
                 await eventBus.PublishAsync(new ContentPublishedIntegrationEvent("Hello"));
-
+                handledService.Handlers.Should().BeEmpty();
                 await Task.Delay(TimeSpan.FromSeconds(5));
+                handledService.Handlers.Should().Contain(nameof(ContentPublishedIntegrationEventHandler));
             }
         }
     }

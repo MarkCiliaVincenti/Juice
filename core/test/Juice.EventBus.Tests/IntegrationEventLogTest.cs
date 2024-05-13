@@ -165,6 +165,7 @@ namespace Juice.EventBus.Tests
                 services.RegisterRabbitMQEventBus(configuration.GetSection("RabbitMQ"));
 
                 services.AddTransient<ContentPublishedIntegrationEventHandler>();
+                services.AddSingleton<HandledService>();
             });
 
             var logger = resolver.ServiceProvider.GetRequiredService<ILogger<IntegrationEventLogTest>>();
