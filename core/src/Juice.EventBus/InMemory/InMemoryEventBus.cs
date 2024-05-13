@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Net.Sockets;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Juice.EventBus
@@ -20,8 +21,10 @@ namespace Juice.EventBus
 
         protected virtual async Task ProcessingEventAsync(string eventName, IntegrationEvent @event)
         {
-
-            Logger.LogTrace("Processing integration event: {EventName}", eventName);
+            if (Logger.IsEnabled(LogLevel.Trace))
+            {
+                Logger.LogTrace("Processing integration event: {EventName}", eventName);
+            }
 
             if (SubsManager.HasSubscriptionsForEvent(eventName))
             {
@@ -34,12 +37,18 @@ namespace Juice.EventBus
                     if (handler == null) { continue; }
                     var eventType = SubsManager.GetEventTypeByName(eventName);
 
-                    var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
-
-                    await (Task)concreteType.GetMethod("HandleAsync").Invoke(handler, new object[] { @event });
+                    try
+                    {
+                        var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+                        concreteType.GetMethod("HandleAsync").Invoke(handler, new object[] { @event });
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError(ex, "Error processing integration event: {EventName}, {Message}", eventName, ex.Message);
+                    }
                 }
             }
-            else
+            else if(Logger.IsEnabled(LogLevel.Trace))
             {
                 Logger.LogWarning("No subscription for integration event: {EventName}", eventName);
             }

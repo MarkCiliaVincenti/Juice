@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Juice.Domain;
 using Juice.EF;
 using Juice.EF.Extensions;
@@ -8,6 +9,7 @@ using Juice.EF.Tests.Infrastructure;
 using Juice.EventBus;
 using Juice.EventBus.IntegrationEventLog.EF;
 using Juice.EventBus.RabbitMQ;
+using Juice.EventBus.Tests;
 using Juice.EventBus.Tests.Events;
 using Juice.EventBus.Tests.Handlers;
 using Juice.Extensions.DependencyInjection;
@@ -83,8 +85,10 @@ namespace Juice.Integrations.Tests
                 services.RegisterRabbitMQEventBus(configuration.GetSection("RabbitMQ"));
 
                 services.AddTransient<ContentPublishedIntegrationEventHandler>();
+                services.AddSingleton<HandledService>();
             });
 
+            var sharedService = resolver.ServiceProvider.GetRequiredService<HandledService>();
             var logger = resolver.ServiceProvider.GetRequiredService<ILogger<IntegrationTest>>();
 
             var eventBus = resolver.ServiceProvider.GetRequiredService<IEventBus>();
@@ -128,7 +132,9 @@ namespace Juice.Integrations.Tests
                 }
             });
             await integrationEventService.PublishEventsThroughEventBusAsync(transactionId);
+            sharedService.Handlers.Should().BeEmpty();
             await Task.Delay(3000);
+            sharedService.Handlers.Should().Contain(nameof(ContentPublishedIntegrationEventHandler));
             var query = unitOfWork.Query();
         }
 

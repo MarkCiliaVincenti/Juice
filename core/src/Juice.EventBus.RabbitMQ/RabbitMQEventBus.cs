@@ -266,11 +266,17 @@ namespace Juice.EventBus.RabbitMQ
 
             var eventName = @event.GetEventKey();
 
-            Logger.LogTrace("Creating RabbitMQ channel to publish event: {EventId} ({EventName})", @event.Id, eventName);
+            if (Logger.IsEnabled(LogLevel.Trace))
+            {
+                Logger.LogTrace("Creating RabbitMQ channel to publish event: {EventId} ({EventName})", @event.Id, eventName);
+            }
 
             using (var channel = _persistentConnection.CreateModel())
             {
-                Logger.LogTrace("Declaring RabbitMQ exchange to publish event: {EventId}", @event.Id);
+                if (Logger.IsEnabled(LogLevel.Trace))
+                {
+                    Logger.LogTrace("Declaring RabbitMQ exchange to publish event: {EventId}", @event.Id);
+                }
 
                 channel.ExchangeDeclare(exchange: BROKER_NAME, type: _type);
 
@@ -284,7 +290,10 @@ namespace Juice.EventBus.RabbitMQ
                     var properties = channel.CreateBasicProperties();
                     properties.DeliveryMode = 2; // persistent
 
-                    Logger.LogDebug("Publishing event to RabbitMQ: {EventId} {EventName}", @event.Id, eventName);
+                    if (Logger.IsEnabled(LogLevel.Debug))
+                    {
+                        Logger.LogDebug("Publishing event to RabbitMQ: {EventId} {EventName}", @event.Id, eventName);
+                    }
 
                     channel.BasicPublish(
                         exchange: BROKER_NAME,

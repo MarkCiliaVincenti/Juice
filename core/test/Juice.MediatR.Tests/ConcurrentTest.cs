@@ -43,6 +43,8 @@ namespace Juice.MediatR.Tests
                     .AddConfiguration(configuration.GetSection("Logging"));
                 });
 
+                services.AddScoped<SharedService>();
+
                 services.AddMediatR(options =>
                 {
                     options.RegisterServicesFromAssemblyContaining(typeof(ConcurrentTest));
@@ -51,11 +53,19 @@ namespace Juice.MediatR.Tests
 
             var logger = resolver.ServiceProvider.GetRequiredService<ILogger<ConcurrentTest>>();
 
-            var mediator = resolver.ServiceProvider.GetRequiredService<IMediator>();
+            using var scope = resolver.ServiceProvider.CreateScope();
+            var sharedService = scope.ServiceProvider.GetRequiredService<SharedService>();
+            sharedService.User = "TestUser";
+
+            using var scope1 = resolver.ServiceProvider.CreateScope();
+            var mediator = scope1.ServiceProvider.GetRequiredService<IMediator>();
+            mediator.Publish(new NoticeA());
+            _testOutput.WriteLine("Single task is started");
 
             Parallel.For(0, 10, async i => await mediator.Publish(new NoticeA()));
             Parallel.For(0, 10, async i => await mediator.Send(new CmdB()));
 
+            _testOutput.WriteLine("All tasks are started");
             await Task.Delay(1000);
         }
     }
@@ -67,14 +77,17 @@ namespace Juice.MediatR.Tests
     public class NoticeAHandler : INotificationHandler<NoticeA>
     {
         private ILogger _logger;
-        public NoticeAHandler(ILogger<NoticeAHandler> logger)
+        private SharedService _sharedService;
+        public NoticeAHandler(ILogger<NoticeAHandler> logger, SharedService sharedService)
         {
             this._logger = logger;
+            _sharedService = sharedService;
         }
         public async Task Handle(NoticeA notification, CancellationToken cancellationToken)
         {
             await Task.Delay(200);
-            _logger.LogInformation("Notice created at {Created} and processed after {After} milliseconds", notification.DateTime, (DateTimeOffset.Now - notification.DateTime).TotalMilliseconds);
+            _logger.LogInformation("Notice created at {Created} and processed after {After} milliseconds. User: {User}",
+                notification.DateTime, (DateTimeOffset.Now - notification.DateTime).TotalMilliseconds, _sharedService.User ?? "");
         }
     }
 
@@ -95,5 +108,10 @@ namespace Juice.MediatR.Tests
             _logger.LogInformation("Command created at {Created} and processed after {After} milliseconds", request.DateTime, (DateTimeOffset.Now - request.DateTime).TotalMilliseconds);
             return 0;
         }
+    }
+
+    public class SharedService
+    {
+        public string? User { get; set; }
     }
 }
