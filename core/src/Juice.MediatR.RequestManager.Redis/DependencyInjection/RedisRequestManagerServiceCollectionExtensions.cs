@@ -1,6 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Juice.MediatR;
+using Juice.MediatR.RequestManager.Redis;
 
-namespace Juice.MediatR.RequestManager.Redis
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class RedisRequestManagerServiceCollectionExtensions
     {
@@ -9,11 +10,10 @@ namespace Juice.MediatR.RequestManager.Redis
         /// <see href="https://learn.microsoft.com/en-us/dotnet/architecture/microservices/multi-container-microservice-net-applications/subscribe-events#deduplicating-message-events-at-the-eventhandler-level"/>
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="configuration"></param>
-        /// <param name="configureOptions"></param>
+        /// <param name="configure"></param>
         /// <returns></returns>
         /// <exception cref="NotSupportedException"></exception>
-        public static IServiceCollection AddRedisRequestManager(this IServiceCollection services,
+        public static IServiceCollection AddRedisMediatorRequestManager(this IServiceCollection services,
             Action<RedisOptions> configure)
         {
             services.Configure<RedisOptions>(configure);
@@ -27,12 +27,10 @@ namespace Juice.MediatR.RequestManager.Redis
         /// <see href="https://learn.microsoft.com/en-us/dotnet/architecture/microservices/multi-container-microservice-net-applications/subscribe-events#deduplicating-message-events-at-the-eventhandler-level"/>
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="configuration"></param>
-        /// <param name="configureOptions"></param>
         /// <returns></returns>
         /// <exception cref="NotSupportedException"></exception>
-        public static IServiceCollection AddRedisRequestManager(this IServiceCollection services)
-            => services.AddRedisRequestManager(_ => { });
+        public static IServiceCollection AddRedisMediatorRequestManager(this IServiceCollection services)
+            => services.AddRedisMediatorRequestManager(_ => { });
 
     }
 }

@@ -1,8 +1,7 @@
 ﻿using Juice.Integrations.EventBus;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Juice.Integrations
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class IntegrationEventServiceCollectionExtensions
     {

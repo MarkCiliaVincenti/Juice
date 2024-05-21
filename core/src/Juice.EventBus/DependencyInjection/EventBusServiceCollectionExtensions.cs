@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Juice.EventBus;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Juice.EventBus
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class EventBusServiceCollectionExtensions
     {
