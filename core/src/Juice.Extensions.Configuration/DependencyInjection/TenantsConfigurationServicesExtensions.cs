@@ -1,7 +1,7 @@
-﻿using Juice.MultiTenant;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Juice.Extensions.Configuration;
+using Juice.MultiTenant;
 
-namespace Juice.Extensions.Configuration
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class TenantsConfigurationServicesExtensions
     {

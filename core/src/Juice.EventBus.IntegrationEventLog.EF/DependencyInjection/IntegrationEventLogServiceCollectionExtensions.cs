@@ -1,13 +1,13 @@
 ﻿using Juice.EF;
 using Juice.EF.Migrations;
+using Juice.EventBus.IntegrationEventLog.EF;
 using Juice.EventBus.IntegrationEventLog.EF.FeatureBuilder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Juice.EventBus.IntegrationEventLog.EF
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class IntegrationEventLogServiceCollectionExtensions
     {

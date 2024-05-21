@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Juice.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
-namespace Juice.Extensions.Options
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ConfigureMutableServiceCollectionExtensions
     {

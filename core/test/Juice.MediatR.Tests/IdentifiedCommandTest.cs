@@ -46,7 +46,7 @@ namespace Juice.MediatR.Tests
 
                 // Register DbContext class
 
-                services.AddRequestManager(configuration, options =>
+                services.AddEFMediatorRequestManager(configuration, options =>
                 {
                     options.DatabaseProvider = "SqlServer";
                     options.Schema = schema;
@@ -91,7 +91,7 @@ namespace Juice.MediatR.Tests
 
                 // Register DbContext class
 
-                services.AddRequestManager(configuration, options =>
+                services.AddEFMediatorRequestManager(configuration, options =>
                 {
                     options.DatabaseProvider = "PostgreSQL";
                     options.Schema = schema;
@@ -157,7 +157,7 @@ namespace Juice.MediatR.Tests
 
                 services.AddDefaultStringIdGenerator();
 
-                services.AddRequestManager(configuration, options =>
+                services.AddEFMediatorRequestManager(configuration, options =>
                 {
                     options.DatabaseProvider = "PostgreSQL";
                     options.Schema = schema;

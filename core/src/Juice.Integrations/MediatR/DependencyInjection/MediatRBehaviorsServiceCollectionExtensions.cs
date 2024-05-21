@@ -1,8 +1,7 @@
 ﻿using Juice.Integrations.MediatR.Behaviors;
 using MediatR;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Juice.Integrations
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class MediatRBehaviorsServiceCollectionExtensions
     {

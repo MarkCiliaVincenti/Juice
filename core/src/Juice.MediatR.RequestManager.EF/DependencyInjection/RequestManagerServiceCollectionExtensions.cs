@@ -1,11 +1,12 @@
 ﻿using Juice.EF;
 using Juice.EF.Migrations;
+using Juice.MediatR;
+using Juice.MediatR.RequestManager.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Juice.MediatR.RequestManager.EF
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class RequestManagerServiceCollectionExtensions
     {
@@ -18,7 +19,7 @@ namespace Juice.MediatR.RequestManager.EF
         /// <param name="configureOptions"></param>
         /// <returns></returns>
         /// <exception cref="NotSupportedException"></exception>
-        public static IServiceCollection AddRequestManager(this IServiceCollection services, IConfiguration configuration,
+        public static IServiceCollection AddEFMediatorRequestManager(this IServiceCollection services, IConfiguration configuration,
             Action<DbOptions>? configureOptions)
         {
             services.AddScoped(p =>
@@ -68,7 +69,7 @@ namespace Juice.MediatR.RequestManager.EF
 
             });
 
-            services.AddScoped<IRequestManager, MediatR.RequestManager.EF.RequestManager>();
+            services.AddScoped<IRequestManager, RequestManager>();
             return services;
         }
     }
