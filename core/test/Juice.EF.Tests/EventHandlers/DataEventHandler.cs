@@ -29,10 +29,6 @@ namespace Juice.EF.Tests.EventHandlers
                 _logger.LogInformation("DataEvent:" + typeof(T).Name + " " + JsonConvert.SerializeObject(dataEvent));
             }
 
-            if (dataEvent?.AuditRecord?.Entity is Content content)
-            {
-                _logger.LogInformation("Entity:" + content.Code);
-            }
             _sharedService.Handlers.Add(typeof(DataEventHandler<T>).Name);
             return Task.CompletedTask;
         }

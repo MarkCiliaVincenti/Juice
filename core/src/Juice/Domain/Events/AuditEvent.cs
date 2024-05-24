@@ -13,6 +13,15 @@ namespace Juice.Domain.Events
         {
         }
         public override bool IsAudit => true;
+
+        public AuditRecord? AuditRecord { get; protected set; }
+
+        public virtual DataEvent SetAuditRecord(AuditRecord record)
+        {
+            AuditRecord = record;
+            return this;
+        }
+
     }
 
     /// <summary>
