@@ -11,40 +11,43 @@ namespace Juice.Domain.Events
         }
         public string Name { get; private set; }
 
-        public AuditRecord? AuditRecord { get; protected set; }
-        public object? Entity { get; protected set; }
-        public virtual DataEvent SetAuditRecord(AuditRecord record)
+        public virtual bool IsAudit => false;
+        public virtual DataEvent SetEntity(object entity) { return this; }
+    }
+
+    public class DataEvent<T> : DataEvent
+    {
+        public DataEvent(string name) : base(name)
         {
-            AuditRecord = record;
-            Entity = record.Entity;
-            return this;
         }
+
+        public T? Entity { get; protected set; }
 
         public virtual DataEvent SetEntity(object entity)
         {
-            Entity = entity;
+            Entity = entity is T t ? t : default;
             return this;
         }
 
-        public virtual bool IsAudit => false;
+        public override bool IsAudit => false;
     }
 
     #region Data events
-    public class DataInserted<T> : DataEvent
+    public class DataInserted<T> : DataEvent<T>
     {
         public DataInserted() : base(nameof(DataEvents.Inserted))
         {
         }
     }
 
-    public class DataModified<T> : DataEvent
+    public class DataModified<T> : DataEvent<T>
     {
         public DataModified() : base(nameof(DataEvents.Modified))
         {
         }
     }
 
-    public class DataDeleted<T> : DataEvent
+    public class DataDeleted<T> : DataEvent<T>
     {
         public DataDeleted() : base(nameof(DataEvents.Deleted))
         {
@@ -69,12 +72,12 @@ namespace Juice.Domain.Events
             var constructor = eventType.GetConstructor(new[] { typeof(string) });
             if (constructor != null)
             {
-                return ((DataEvent)constructor.Invoke(new object[] { dataEvent.Name })).SetAuditRecord(record);
+                return ((AuditEvent)constructor.Invoke(new object[] { dataEvent.Name })).SetAuditRecord(record);
             }
             else
             {
                 constructor = eventType.GetConstructor(new Type[0]);
-                return ((DataEvent)constructor!.Invoke(new object[0])).SetAuditRecord(record);
+                return ((AuditEvent)constructor!.Invoke(new object[0])).SetAuditRecord(record);
             }
         }
 
