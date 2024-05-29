@@ -42,8 +42,11 @@ namespace Juice.EventBus.Tests
                 services.RegisterInMemoryEventBus();
 
                 services.AddTransient<ContentPublishedIntegrationEventHandler>();
+                services.AddTransient<ContentPublishedIntegrationEventHandler1>();
 
                 services.AddSingleton<HandledService>();
+
+                services.AddScoped<ScopedService>();
             });
 
             _serviceProvider = resolver.ServiceProvider;
@@ -59,11 +62,13 @@ namespace Juice.EventBus.Tests
                 var handledService = _serviceProvider.GetRequiredService<HandledService>();
 
                 eventBus.Subscribe<ContentPublishedIntegrationEvent, ContentPublishedIntegrationEventHandler>();
+                eventBus.Subscribe<ContentPublishedIntegrationEvent, ContentPublishedIntegrationEventHandler1>();
 
                 await eventBus.PublishAsync(new ContentPublishedIntegrationEvent("Hello"));
                 handledService.Handlers.Should().BeEmpty();
                 await Task.Delay(TimeSpan.FromSeconds(5));
                 handledService.Handlers.Should().Contain(nameof(ContentPublishedIntegrationEventHandler));
+                handledService.Handlers.Should().Contain(nameof(ContentPublishedIntegrationEventHandler1));
             }
         }
     }
