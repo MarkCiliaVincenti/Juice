@@ -23,7 +23,7 @@ namespace Juice.Domain.Events
 
         public T? Entity { get; protected set; }
 
-        public virtual DataEvent SetEntity(object entity)
+        public override DataEvent SetEntity(object entity)
         {
             Entity = entity is T t ? t : default;
             return this;

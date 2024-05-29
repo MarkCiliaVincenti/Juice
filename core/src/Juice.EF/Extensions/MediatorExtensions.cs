@@ -84,7 +84,11 @@ namespace Juice.EF.Extensions
             }
             catch (Exception ex)
             {
-                logger?.LogWarning(ex, "[DbContextBase][NotificationChanges] {0}", ex.Message);
+                logger?.LogWarning(ex, "[DispatchDataChangeEvents] Error: {0}", ex.Message);
+                if(logger != null && logger.IsEnabled(LogLevel.Trace))
+                {
+                    logger.LogError(ex, "[DispatchDataChangeEvents] Error trace: {0}", ex.StackTrace);
+                }
             }
         }
 
