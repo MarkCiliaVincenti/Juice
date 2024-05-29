@@ -20,6 +20,7 @@ namespace Juice.EF.Tests.EventHandlers
         public Task Handle(DataInserted<Content> dataEvent, CancellationToken cancellationToken)
         {
             _logger.LogInformation("ContentDataEvent:" + JsonConvert.SerializeObject(dataEvent));
+            _logger.LogInformation("ContentDataEvent:" + dataEvent.Entity?.Id);
             _sharedService.Handlers.Add(typeof(ContentDataEventHandler).Name);
             return Task.CompletedTask;
         }
