@@ -20,7 +20,35 @@ namespace Juice.EventBus
             _scopeFactory = scopeFactory;
         }
 
-        public override Task PublishAsync(IntegrationEvent @event) => ProcessingEventAsync(SubsManager.GetEventKey(@event), @event);
+        public override Task PublishAsync(IntegrationEvent @event)
+        {
+            var eventName = SubsManager.GetEventKey(@event);
+            var _task = ProcessingEventAsync(eventName, @event);
+            _task.ContinueWith(task =>
+            {
+                if (task.IsFaulted)
+                {
+                    Logger.LogError(task.Exception, "Error handling integration event: {EventName}, {Message}", eventName, task.Exception?.Message);
+                }
+                else // remove task from tasks list
+                {
+                    lock (_tasks)
+                    {
+                        var managedTask = _tasks.FirstOrDefault(t => t.Id == task.Id);
+                        if (managedTask != null)
+                        {
+                            _tasks.Remove(managedTask);
+                        }
+                    }
+                }
+            })
+            ;
+            lock (_tasks)
+            {
+                _tasks.Add(_task);
+            }
+            return Task.CompletedTask;
+        }
 
         protected virtual async Task ProcessingEventAsync(string eventName, IntegrationEvent @event)
         {
@@ -35,46 +63,14 @@ namespace Juice.EventBus
                 var subscriptions = SubsManager.GetHandlersForEvent(eventName);
                 foreach (var subscription in subscriptions)
                 {
-
                     var handler = scope.ServiceProvider.GetService(subscription.HandlerType);
                     if (handler == null) { continue; }
                     var eventType = SubsManager.GetEventTypeByName(eventName);
-                    var handlerName = handler.GetType().Name;
                     try
                     {
                         var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
                         // It worked but not sure if it's the best way to do it
-                        var _task = (Task)concreteType.GetMethod("HandleAsync").Invoke(handler, new object[] { @event });
-                        _task!.ContinueWith(task =>
-                             {
-                                if (task.IsFaulted)
-                                 {
-                                    Logger.LogError(task.Exception, "Error handling integration event: {EventName}, {Message}", eventName, task.Exception?.Message);
-                                 }
-                                 else // remove task from tasks list
-                                 {
-                                     lock (_tasks)
-                                     {
-                                         var managedTask = _tasks.FirstOrDefault(t => t.Id == task.Id);
-                                         if(managedTask!=null)
-                                         {
-                                             _tasks.Remove(managedTask);
-                                         }
-                                         else
-                                         {
-                                         }
-                                     }
-                                     if(Logger.IsEnabled(LogLevel.Debug))
-                                     {
-                                         Logger.LogDebug("Integration event handled: {EventName}, by {HandlerName}", eventName, handlerName);
-                                     }
-                                 }
-                            })
-                            ;
-                        lock (_tasks)
-                        {
-                            _tasks.Add(_task);
-                        }
+                        await (Task)concreteType.GetMethod("HandleAsync").Invoke(handler, new object[] { @event });
                     }
                     catch (Exception ex)
                     {
@@ -82,7 +78,7 @@ namespace Juice.EventBus
                     }
                 }
             }
-            else if(Logger.IsEnabled(LogLevel.Trace))
+            else if (Logger.IsEnabled(LogLevel.Trace))
             {
                 Logger.LogWarning("No subscription for integration event: {EventName}", eventName);
             }
