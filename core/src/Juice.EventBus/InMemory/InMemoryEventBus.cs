@@ -52,35 +52,34 @@ namespace Juice.EventBus
 
         protected virtual async Task ProcessingEventAsync(string eventName, IntegrationEvent @event)
         {
-            if (Logger.IsEnabled(LogLevel.Trace))
+            using (Logger.BeginScope($"Processing integration event: {eventName} {@event.Id}"))
             {
-                Logger.LogTrace("Processing integration event: {EventName}", eventName);
-            }
 
-            if (SubsManager.HasSubscriptionsForEvent(eventName))
-            {
-                using var scope = _scopeFactory.CreateScope();
-                var subscriptions = SubsManager.GetHandlersForEvent(eventName);
-                foreach (var subscription in subscriptions)
+                if (SubsManager.HasSubscriptionsForEvent(eventName))
                 {
-                    var handler = scope.ServiceProvider.GetService(subscription.HandlerType);
-                    if (handler == null) { continue; }
-                    var eventType = SubsManager.GetEventTypeByName(eventName);
-                    try
+                    using var scope = _scopeFactory.CreateScope();
+                    var subscriptions = SubsManager.GetHandlersForEvent(eventName);
+                    foreach (var subscription in subscriptions)
                     {
-                        var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
-                        // It worked but not sure if it's the best way to do it
-                        await (Task)concreteType.GetMethod("HandleAsync").Invoke(handler, new object[] { @event });
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.LogError(ex, "Error processing integration event: {EventName}, {Message}", eventName, ex.Message);
+                        var handler = scope.ServiceProvider.GetService(subscription.HandlerType);
+                        if (handler == null) { continue; }
+                        var eventType = SubsManager.GetEventTypeByName(eventName);
+                        try
+                        {
+                            var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+                            // It worked but not sure if it's the best way to do it
+                            await (Task)concreteType.GetMethod("HandleAsync").Invoke(handler, new object[] { @event });
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.LogError(ex, "Error processing integration event: {EventName}, {Message}", eventName, ex.Message);
+                        }
                     }
                 }
-            }
-            else if (Logger.IsEnabled(LogLevel.Trace))
-            {
-                Logger.LogWarning("No subscription for integration event: {EventName}", eventName);
+                else if (Logger.IsEnabled(LogLevel.Trace))
+                {
+                    Logger.LogWarning("No subscription for integration event: {EventName}", eventName);
+                }
             }
         }
 
