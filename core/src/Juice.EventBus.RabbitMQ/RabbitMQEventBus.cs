@@ -168,45 +168,46 @@ namespace Juice.EventBus.RabbitMQ
 
         private async Task<bool> ProcessingEventAsync(string eventName, string message)
         {
-            Logger.LogDebug("Processing RabbitMQ event: {EventName}", eventName);
-
-            if (SubsManager.HasSubscriptionsForEvent(eventName))
+            using (Logger.BeginScope($"Processing integration event: {eventName}"))
             {
-                using var scope = _scopeFactory.CreateScope();
-                var subscriptions = SubsManager.GetHandlersForEvent(eventName);
-                Logger.LogTrace("Found {count} handlers for event: {EventName}", subscriptions.Count(), eventName);
-                var ok = false;
-                foreach (var subscription in subscriptions)
+                if (SubsManager.HasSubscriptionsForEvent(eventName))
                 {
-                    var handler = scope.ServiceProvider.GetService(subscription.HandlerType);
-                    if (handler == null)
+                    using var scope = _scopeFactory.CreateScope();
+                    var subscriptions = SubsManager.GetHandlersForEvent(eventName);
+                    Logger.LogTrace("Found {count} handlers for event: {EventName}", subscriptions.Count(), eventName);
+                    var ok = false;
+                    foreach (var subscription in subscriptions)
                     {
-                        Logger.LogWarning("Type {typeName} not registered as a service", subscription.HandlerType.Name);
+                        var handler = scope.ServiceProvider.GetService(subscription.HandlerType);
+                        if (handler == null)
+                        {
+                            Logger.LogWarning("Type {typeName} not registered as a service", subscription.HandlerType.Name);
 
-                        continue;
-                    }
-                    var eventType = SubsManager.GetEventTypeByName(eventName);
-                    var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
-                    var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+                            continue;
+                        }
+                        var eventType = SubsManager.GetEventTypeByName(eventName);
+                        var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
+                        var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
 
-                    await Task.Yield();
-                    try
-                    {
-                        await (Task)concreteType.GetMethod(nameof(IIntegrationEventHandler<IntegrationEvent>.HandleAsync)).Invoke(handler, new object[] { integrationEvent });
-                        ok = true;
+                        await Task.Yield();
+                        try
+                        {
+                            await (Task)concreteType.GetMethod(nameof(IIntegrationEventHandler<IntegrationEvent>.HandleAsync)).Invoke(handler, new object[] { integrationEvent });
+                            ok = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            var eventId = integrationEvent != null ? ((IntegrationEvent)integrationEvent).Id : Guid.Empty;
+                            Logger.LogError(ex, "{handler} failed to handle event: {EventName}, eventId: {eventId}", handler.GetGenericTypeName(), eventName, eventId);
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        var eventId = integrationEvent != null ? ((IntegrationEvent)integrationEvent).Id : Guid.Empty;
-                        Logger.LogError(ex, "{handler} failed to handle event: {EventName}, eventId: {eventId}", handler.GetGenericTypeName(), eventName, eventId);
-                    }
+                    return ok;
                 }
-                return ok;
-            }
-            else
-            {
-                Logger.LogDebug("No subscription for RabbitMQ event: {EventName}", eventName);
-                return false;
+                else
+                {
+                    Logger.LogDebug("No subscription for RabbitMQ event: {EventName}", eventName);
+                    return false;
+                }
             }
         }
 

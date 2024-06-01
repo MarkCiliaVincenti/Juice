@@ -51,7 +51,10 @@ namespace Juice.EventBus.Tests
 
                 services.RegisterRabbitMQEventBus(configuration.GetSection("RabbitMQ"));
 
+                services.AddScoped<ScopedService>();
+
                 services.AddTransient<ContentPublishedIntegrationEventHandler>();
+                services.AddTransient<ContentPublishedIntegrationEventHandler1>();
                 services.AddSingleton<HandledService>();
             });
 
@@ -60,6 +63,7 @@ namespace Juice.EventBus.Tests
             if (eventBus != null)
             {
                 eventBus.Subscribe<ContentPublishedIntegrationEvent, ContentPublishedIntegrationEventHandler>();
+                eventBus.Subscribe<ContentPublishedIntegrationEvent, ContentPublishedIntegrationEventHandler1>();
 
                 for (var i = 0; i < 10; i++)
                 {
@@ -69,6 +73,7 @@ namespace Juice.EventBus.Tests
                 await Task.Delay(TimeSpan.FromSeconds(3));
 
                 eventBus.Unsubscribe<ContentPublishedIntegrationEvent, ContentPublishedIntegrationEventHandler>();
+                eventBus.Unsubscribe<ContentPublishedIntegrationEvent, ContentPublishedIntegrationEventHandler1>();
                 await Task.Delay(TimeSpan.FromSeconds(3));
             }
         }
