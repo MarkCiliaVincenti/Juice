@@ -117,7 +117,7 @@ namespace Juice.EF.Extensions
 
                     AuditEntry? auditEntry = default;
 
-                    if (entry.Metadata.IsAuditable() || entry.Metadata.IsNoticeFor(EntityStates.Modified))
+                    if (entry.Metadata.IsAuditable() || (entry.State == EntityState.Modified && entry.Metadata.IsNoticeFor(EntityStates.Modified)))
                     {
                         auditEntry = new AuditEntry(entry, entry.Metadata?.GetTableName(),
                             entry.State == EntityState.Added ? DataEvents.Inserted
