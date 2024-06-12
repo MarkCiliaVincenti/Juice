@@ -3,7 +3,7 @@ using Juice.Domain;
 
 namespace Juice.EF.Tests.Domain
 {
-    [Notice(EntityStates.Created)]
+    [Notice(EntityStates.Created | EntityStates.Modified)]
     public class Content : DynamicAuditEntity<Guid>
     {
         public Content(string code, string name)

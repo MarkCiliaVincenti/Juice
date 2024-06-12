@@ -36,7 +36,7 @@ namespace Juice.EF
 
         public bool HasTemporaryProperties => TemporaryProperties.Any();
 
-        private AuditRecord CreateRecord()
+        public AuditRecord CreateRecord()
         {
             return new AuditRecord(Table)
             {

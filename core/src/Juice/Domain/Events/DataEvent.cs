@@ -13,6 +13,14 @@ namespace Juice.Domain.Events
 
         public virtual bool IsAudit => false;
         public virtual DataEvent SetEntity(object entity) { return this; }
+
+        public AuditRecord? AuditRecord { get; protected set; }
+
+        public virtual DataEvent SetAuditRecord(AuditRecord record)
+        {
+            AuditRecord = record;
+            return this;
+        }
     }
 
     public class DataEvent<T> : DataEvent
@@ -97,6 +105,16 @@ namespace Juice.Domain.Events
                 constructor = eventType.GetConstructor(new Type[0]);
                 return ((DataEvent)constructor!.Invoke(new object[0])).SetEntity(entity);
             }
+        }
+
+        public static DataEvent CreateDataEvent(this DataEvent dataEvent, Type eventType, object entity, AuditRecord? auditRecord)
+        {
+            var @event = dataEvent.CreateDataEvent(eventType, entity);
+            if (auditRecord != null)
+            {
+                return @event.SetAuditRecord(auditRecord);
+            }
+            return @event;
         }
     }
 }
