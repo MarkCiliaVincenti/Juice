@@ -19,7 +19,7 @@
     <AppTargetFramework>net6.0;net8.0</AppTargetFramework>
     <AspNetCoreVersion>2.2.0</AspNetCoreVersion>
     <MicrosoftExtensionsVersion>8.0.*</MicrosoftExtensionsVersion>
-    <EFVersion>7.0.11</EFVersion>
+    <EFVersion>7.0.*</EFVersion>
     <NpgsqlVersion>7.0.11</NpgsqlVersion>
     <GrpcVersion>2.57.0</GrpcVersion>
     <ProtobufVersion>3.24.3</ProtobufVersion>
