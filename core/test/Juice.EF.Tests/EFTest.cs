@@ -184,7 +184,7 @@ namespace Juice.EF.Tests
         public async Task DataEvent_should_be_handle_Async()
         {
             var mediator = _serviceProvider.GetRequiredService<IMediator>();
-            var dataEvent = DataEvents.Inserted.CreateAuditEvent(typeof(DataInserted<>), typeof(Content), new AuditRecord("TestTable"));
+            var dataEvent = DataEvents.Inserted.CreateDataEvent(typeof(DataInserted<>), typeof(Content), new AuditRecord("TestTable"));
 
             await mediator.Publish(dataEvent).ConfigureAwait(false);
             await Task.Delay(1000);
