@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Globalization;
+using System.Linq.Expressions;
 
 namespace Juice.Extensions
 {
@@ -16,7 +17,8 @@ namespace Juice.Extensions
             var propertyInfo = entityType.GetProperty(propertyName);
             ParameterExpression arg = Expression.Parameter(entityType, "x");
             MemberExpression property = Expression.Property(arg, propertyName);
-            var selector = Expression.Lambda<Func<TSource, object>>(property, new ParameterExpression[] { arg });
+            var selector = Expression.Lambda<Func<TSource, object>>(
+                Expression.Convert(property, typeof(object)), new ParameterExpression[] { arg });
 
             return query.OrderBy(selector);
         }
@@ -32,7 +34,8 @@ namespace Juice.Extensions
             //Create x=>x.PropName
             ParameterExpression arg = Expression.Parameter(entityType, "x");
             MemberExpression property = Expression.Property(arg, propertyName);
-            var selector = Expression.Lambda<Func<TSource, object>>(property, new ParameterExpression[] { arg });
+            var selector = Expression.Lambda<Func<TSource, object>>(
+                Expression.Convert(property, typeof(object)), new ParameterExpression[] { arg });
 
             return query.ThenBy(selector);
         }
@@ -46,10 +49,10 @@ namespace Juice.Extensions
                 return query;
             }
             //Create x=>x.PropName
-            var propertyInfo = entityType.GetProperty(propertyName);
             ParameterExpression arg = Expression.Parameter(entityType, "x");
             MemberExpression property = Expression.Property(arg, propertyName);
-            var selector = Expression.Lambda<Func<TSource, object>>(property, new ParameterExpression[] { arg });
+            var selector = Expression.Lambda<Func<TSource, object>>(
+                Expression.Convert(property, typeof(object)), new ParameterExpression[] { arg });
 
             return query.OrderByDescending(selector);
         }
@@ -65,7 +68,8 @@ namespace Juice.Extensions
             //Create x=>x.PropName
             ParameterExpression arg = Expression.Parameter(entityType, "x");
             MemberExpression property = Expression.Property(arg, propertyName);
-            var selector = Expression.Lambda<Func<TSource, object>>(property, new ParameterExpression[] { arg });
+            var selector = Expression.Lambda<Func<TSource, object>>(
+                Expression.Convert(property, typeof(object)), new ParameterExpression[] { arg });
 
             return query.ThenByDescending(selector);
         }

@@ -40,6 +40,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\test\Juice.XUnit\Juice.XUnit.csproj" />
+    <ProjectReference Include="..\..\src\Juice.AspNetCore\Juice.AspNetCore.csproj" />
     <ProjectReference Include="..\..\src\Juice.EF\Juice.EF.csproj" />
   </ItemGroup>
 

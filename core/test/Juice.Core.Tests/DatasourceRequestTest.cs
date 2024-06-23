@@ -3,24 +3,24 @@ using Xunit;
 
 namespace Juice.Core.Tests
 {
-    public class TableQueryTest
+    public class DatasourceRequestTest
     {
         [Fact]
         public void QueryShould()
         {
-            var request = new TableQuery
+            var request = new DatasourceRequest
             {
                 Query = "  a b  c  ",
                 Page = 2,
                 PageSize = 100,
                 Sorts = new[]
                 {
-                    new Sort
+                    new SortDescriptor
                     {
                         Property = "a",
                         Direction = SortDirection.Asc
                     },
-                    new Sort
+                    new SortDescriptor
                     {
                         Property = "b",
                         Direction = SortDirection.Desc

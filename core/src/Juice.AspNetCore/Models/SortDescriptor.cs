@@ -4,7 +4,7 @@
     /// <summary>
     /// Sort data
     /// </summary>
-    public class Sort
+    public class SortDescriptor
     {
         /// <summary>
         /// Sort property
