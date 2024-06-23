@@ -1,5 +1,9 @@
 ﻿namespace Juice.Modular
 {
+    /// <summary>
+    /// Specifies feature information for a module
+    /// <para>Default Name of module will be namespace of startup class with underscore</para>
+    /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
     public class Feature : Attribute
     {

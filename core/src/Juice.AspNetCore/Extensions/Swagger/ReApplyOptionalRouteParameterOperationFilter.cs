@@ -4,6 +4,9 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Juice.Extensions.Swagger
 {
+    /// <summary>
+    /// Allow user to send empty value for optional route parameter by checking "Send empty value" in Swagger UI
+    /// </summary>
     public class ReApplyOptionalRouteParameterOperationFilter : IOperationFilter
     {
         private const string _captureName = "routeParameter";
