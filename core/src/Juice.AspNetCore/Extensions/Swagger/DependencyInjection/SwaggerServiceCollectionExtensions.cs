@@ -5,6 +5,7 @@ namespace Juice.Extensions.Swagger
 {
     public static class SwaggerServiceCollectionExtensions
     {
+        [Obsolete("Use RequiredScope attibute to specify scope required by api")]
         public static IServiceCollection ConfigureSwaggerApiOptions(this IServiceCollection services,
             IConfiguration configuration)
         {

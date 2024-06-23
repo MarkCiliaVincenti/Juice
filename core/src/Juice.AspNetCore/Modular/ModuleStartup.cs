@@ -8,9 +8,17 @@ namespace Juice.Modular
 {
     public abstract class ModuleStartup : IModuleStartup
     {
+        /// <summary>
+        /// Default value is 10
+        /// </summary>
         public virtual int StartOrder => 10;
+
+        /// <summary>
+        /// Default value is StartOrder
+        /// </summary>
         public virtual int ConfigureOrder => StartOrder;
 
+        
         public virtual void Configure(IApplicationBuilder app, IEndpointRouteBuilder routes, IWebHostEnvironment env)
         {
         }
