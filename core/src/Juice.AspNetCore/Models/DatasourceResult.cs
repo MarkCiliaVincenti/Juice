@@ -1,6 +1,6 @@
 ﻿namespace Juice.AspNetCore.Models
 {
-    public class TableResult<T>
+    public class DatasourceResult<T>
     {
         /// <summary>
         /// Current page number, min value is 1
@@ -15,7 +15,7 @@
         /// <summary>
         /// Data set of current page
         /// </summary>
-        public T[] Data { get; set; } = Array.Empty<T>();
+        public IReadOnlyCollection<T> Data { get; set; } = Array.Empty<T>();
 
         /// <summary>
         /// Total count of data set without pagination

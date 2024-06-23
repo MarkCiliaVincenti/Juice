@@ -1,16 +1,14 @@
 ﻿using System.Text.RegularExpressions;
 using Juice.CompnentModel;
-using Juice.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
 
 namespace Juice.AspNetCore.Models
 {
     /// <summary>
-    /// Basic table query model.
+    /// Basic datasource request.
     /// </summary>
-    public class TableQuery
+    public class DatasourceRequest
     {
         private string? _q;
 
@@ -38,7 +36,7 @@ namespace Juice.AspNetCore.Models
         /// <summary>
         /// Sorts data
         /// </summary>
-        public Sort[] Sorts { get; set; } = new Sort[0];
+        public SortDescriptor[] Sorts { get; set; } = new SortDescriptor[0];
 
         /// <summary>
         /// Page number, start from 1.
@@ -75,7 +73,7 @@ namespace Juice.AspNetCore.Models
                 PageSize = 10;
             }
 
-            foreach (Sort sort in Sorts)
+            foreach (SortDescriptor sort in Sorts)
             {
                 if (string.IsNullOrEmpty(sort.Property))
                 {
@@ -84,45 +82,6 @@ namespace Juice.AspNetCore.Models
             }
         }
 
-        public IQueryable<TSource> ApplyQuery<TSource>(
-            IQueryable<TSource> query)
-        {
-            foreach (var sort in Sorts)
-            {
-                var property = string.Concat(sort.Property[0].ToString().ToUpper(), sort.Property.AsSpan(1));
-
-                if (sort.Direction == SortDirection.Asc)
-                {
-                    query = query is IOrderedQueryable<TSource> ordered
-                        && query.Expression.Type == typeof(IOrderedQueryable<TSource>)
-                        ? ordered.ThenBy(property)
-                        : query.OrderBy(property);
-                }
-                else
-                {
-                    query = query is IOrderedQueryable<TSource> ordered
-                        && query.Expression.Type == typeof(IOrderedQueryable<TSource>)
-                        ? ordered.ThenByDescending(property)
-                        : query.OrderByDescending(property);
-                }
-            }
-
-            return query.Skip(SkipCount).Take(PageSize);
-        }
-
-        public async Task<TableResult<TSource>> ToTableResultAsync<TSource>(IQueryable<TSource> query, CancellationToken token)
-        {
-            var count = await query.CountAsync(token);
-
-            var result = new TableResult<TSource>
-            {
-                Page = Page,
-                PageSize = PageSize,
-                Count = count,
-                Data = await ApplyQuery(query).ToArrayAsync(token)
-            };
-            return result;
-        }
     }
 
 }
