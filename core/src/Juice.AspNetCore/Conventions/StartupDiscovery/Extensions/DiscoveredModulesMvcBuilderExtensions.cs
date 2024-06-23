@@ -61,10 +61,10 @@ namespace Juice.Conventions.StartupDiscovery.Extensions
             var appOptions = new FeatureOptions();
             configuration.GetSection("App").Bind(appOptions);
 
-            var enabled = appOptions.Features ?? [];
-            var disabled = appOptions.ExcludedFeatures ?? [];
+            var enabled = appOptions.Features ?? Array.Empty<string>();
+            var disabled = appOptions.ExcludedFeatures ?? Array.Empty<string>();
 
-            var requirements = GetRequirementFeatures(types, [], enabled, disabled, logger);
+            var requirements = GetRequirementFeatures(types, new HashSet<string>(), enabled, disabled, logger);
 
             var hasConflict = false;
 
