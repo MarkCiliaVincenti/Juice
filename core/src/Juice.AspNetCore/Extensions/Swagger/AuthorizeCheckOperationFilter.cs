@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi.Models;
+using Microsoft.Identity.Web.Resource;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Juice.Extensions.Swagger
@@ -20,6 +21,25 @@ namespace Juice.Extensions.Swagger
                 operation.Responses.Add("401", new OpenApiResponse { Description = "Unauthorized" });
                 operation.Responses.Add("403", new OpenApiResponse { Description = "Forbidden" });
 
+                var attr = context.MethodInfo.GetCustomAttributes(true).OfType<RequiredScopeAttribute>().FirstOrDefault();
+                var controllerAttr = context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<RequiredScopeAttribute>().FirstOrDefault();
+                var scopes = attr?.AcceptedScope ?? controllerAttr?.AcceptedScope ?? new string[0];
+
+                operation.Security = new List<OpenApiSecurityRequirement>
+                {
+                    new OpenApiSecurityRequirement
+                    {
+                        [
+                            new OpenApiSecurityScheme {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "oauth2"
+                                }
+                            }
+                        ] = scopes
+                    }
+                };
             }
         }
     }
