@@ -20,6 +20,6 @@
         /// <summary>
         /// Total count of data set without pagination
         /// </summary>
-        public int Count { get; set; }
+        public long Count { get; set; }
     }
 }
