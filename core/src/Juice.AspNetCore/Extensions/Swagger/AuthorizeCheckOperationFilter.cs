@@ -21,9 +21,9 @@ namespace Juice.Extensions.Swagger
                 operation.Responses.Add("401", new OpenApiResponse { Description = "Unauthorized" });
                 operation.Responses.Add("403", new OpenApiResponse { Description = "Forbidden" });
 
-                var attr = context.MethodInfo.GetCustomAttributes(true).OfType<RequiredScopeAttribute>().FirstOrDefault();
-                var controllerAttr = context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<RequiredScopeAttribute>().FirstOrDefault();
-                var scopes = attr?.AcceptedScope ?? controllerAttr?.AcceptedScope ?? new string[0];
+                var scopeAttribute = context.MethodInfo.GetCustomAttributes(true).OfType<RequiredScopeAttribute>().FirstOrDefault()??
+                    context.MethodInfo.DeclaringType?.GetCustomAttributes(true).OfType<RequiredScopeAttribute>().FirstOrDefault();
+                var scopes = scopeAttribute?.AcceptedScope ?? new string[0];
 
                 operation.Security = new List<OpenApiSecurityRequirement>
                 {
