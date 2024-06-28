@@ -50,10 +50,14 @@ namespace Juice.EF.Extensions
         {
             try
             {
-                builder.Property<string?>(nameof(ICreationInfo.CreatedUser)).HasMaxLength(Constants.NameLength);
-                builder.Property<string?>(nameof(IModificationInfo.ModifiedUser)).HasMaxLength(Constants.NameLength);
-                builder.Property<DateTimeOffset>(nameof(ICreationInfo.CreatedDate)).IsRequired();
-                builder.Property<DateTimeOffset?>(nameof(IModificationInfo.ModifiedDate));
+                if (builder.Metadata.ClrType.IsAssignableTo(typeof(ICreationInfo)))
+                {
+                    builder.Property<string?>(nameof(ICreationInfo.CreatedUser)).HasMaxLength(Constants.NameLength);
+                }
+                if (builder.Metadata.ClrType.IsAssignableTo(typeof(IModificationInfo)))
+                {
+                    builder.Property<string?>(nameof(IModificationInfo.ModifiedUser)).HasMaxLength(Constants.NameLength);
+                }
                 builder.HasAnnotation(Constants.AuditAnnotationName, true);
             }
             catch (Exception ex)
