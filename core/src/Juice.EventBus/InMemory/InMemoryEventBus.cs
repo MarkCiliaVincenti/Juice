@@ -22,7 +22,7 @@ namespace Juice.EventBus
 
         public override Task PublishAsync(IntegrationEvent @event)
         {
-            var eventName = SubsManager.GetEventKey(@event);
+            var eventName = @event.GetEventKey();
             var _task = ProcessingEventAsync(eventName, @event);
             _task.ContinueWith(task =>
             {

@@ -44,6 +44,8 @@ namespace Juice.EventBus.Tests
                 services.AddTransient<ContentPublishedIntegrationEventHandler>();
                 services.AddTransient<ContentPublishedIntegrationEventHandler1>();
 
+                services.AddTransient<TopicIntegrationEventHandler>();
+
                 services.AddSingleton<HandledService>();
 
                 services.AddScoped<ScopedService>();
@@ -66,9 +68,31 @@ namespace Juice.EventBus.Tests
 
                 await eventBus.PublishAsync(new ContentPublishedIntegrationEvent("Hello"));
                 handledService.Handlers.Should().BeEmpty();
-                await Task.Delay(TimeSpan.FromSeconds(5));
+                await Task.Delay(TimeSpan.FromSeconds(1));
                 handledService.Handlers.Should().Contain(nameof(ContentPublishedIntegrationEventHandler));
                 handledService.Handlers.Should().Contain(nameof(ContentPublishedIntegrationEventHandler1));
+            }
+        }
+
+        [IgnoreOnCIFact(DisplayName = "Topic event InMemory event bus")]
+        public async Task InMemoryTopicTestAsync()
+        {
+            var eventBus = _serviceProvider.GetService<IEventBus>();
+            if (eventBus != null)
+            {
+                var handledService = _serviceProvider.GetRequiredService<HandledService>();
+
+                eventBus.Subscribe<TopicIntegrationEvent, TopicIntegrationEventHandler>("*.upload");
+                eventBus.Subscribe<TopicIntegrationEvent, TopicIntegrationEventHandler>();
+
+                await eventBus.PublishAsync(new TopicIntegrationEvent("abc.xyz"));
+                await Task.Delay(TimeSpan.FromSeconds(1));
+                handledService.Handlers.Should().BeEmpty();
+
+                await eventBus.PublishAsync(new TopicIntegrationEvent("abc.upload"));
+                await Task.Delay(TimeSpan.FromSeconds(1));
+                handledService.Handlers.Should().Contain(nameof(TopicIntegrationEventHandler));
+
             }
         }
     }

@@ -10,15 +10,18 @@ namespace Juice.EventBus
 
         private readonly ILogger _logger;
 
-        public event EventHandler<string> OnEventRemoved;
+        public event EventHandler<string>? OnEventRemoved;
 
         private Guid _guid = Guid.NewGuid();
 
-        public InMemoryEventBusSubscriptionsManager(ILogger<InMemoryEventBusSubscriptionsManager> logger)
+        private bool _topicSupported;
+
+        public InMemoryEventBusSubscriptionsManager(ILogger<InMemoryEventBusSubscriptionsManager> logger, bool topicSupport)
         {
             _handlers = new Dictionary<string, List<SubscriptionInfo>>();
             _eventTypes = new Dictionary<string, Type>();
             _logger = logger;
+            _topicSupported = topicSupport;
         }
 
         public bool IsEmpty => !_handlers.Keys.Any();
@@ -28,7 +31,7 @@ namespace Juice.EventBus
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            var eventName = key ?? this.GetEventKey<T>();
+            var eventName = key ?? this.GetDefaultEventKey<T>();
 
             DoAddSubscription(typeof(TH), eventName, isDynamic: false);
 
@@ -64,7 +67,7 @@ namespace Juice.EventBus
             where TH : IIntegrationEventHandler<T>
             where T : IntegrationEvent
         {
-            var eventName = key ?? this.GetEventKey<T>();
+            var eventName = key ?? this.GetDefaultEventKey<T>();
             var handlerToRemove = DoFindSubscriptionToRemove(eventName, typeof(TH));
 
             DoRemoveHandler(eventName, handlerToRemove);
@@ -89,7 +92,15 @@ namespace Juice.EventBus
         public IEnumerable<SubscriptionInfo> GetHandlersForEvent(string eventName)
         {
             _logger.LogDebug("{Id} Get subscriptions of {eventName}.", _guid, eventName);
-            if (_handlers.ContainsKey(eventName)) return _handlers[eventName];
+            if (_handlers.ContainsKey(eventName)) { return _handlers[eventName]; }
+            if(!_topicSupported) { return Array.Empty<SubscriptionInfo>(); }
+            foreach (var key in _handlers.Keys)
+            {
+                if (RoutingKeyUtils.IsTopicMatch(eventName, key))
+                {
+                    return _handlers[key];
+                }
+            }
             return Array.Empty<SubscriptionInfo>();
         }
 
@@ -111,7 +122,7 @@ namespace Juice.EventBus
         }
 
         public bool HasSubscriptionsForEvent(string eventName) => _handlers.ContainsKey(eventName)
-            ;
+            || (_topicSupported && _handlers.Keys.Any(key => RoutingKeyUtils.IsTopicMatch(eventName, key)));
 
         public Type GetEventTypeByName(string eventName)
         {
@@ -119,11 +130,18 @@ namespace Juice.EventBus
             {
                 return _eventTypes[eventName];
             }
-
+            if(!_topicSupported) { return default; }
+            foreach (var key in _eventTypes.Keys)
+            {
+                if (RoutingKeyUtils.IsTopicMatch(eventName, key))
+                {
+                    return _eventTypes[key];
+                }
+            }
             return default;
         }
 
-        public string GetEventKey(Type type)
+        public string GetDefaultEventKey(Type type)
         {
             return type.Name;
         }
