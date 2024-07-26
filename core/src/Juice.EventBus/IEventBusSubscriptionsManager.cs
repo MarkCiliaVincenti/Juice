@@ -18,15 +18,13 @@
         Type GetEventTypeByName(string eventName);
         void Clear();
         IEnumerable<SubscriptionInfo> GetHandlersForEvent(string eventName);
-        string GetEventKey(Type type);
+        string GetDefaultEventKey(Type type);
     }
 
     public static class EventBusSubscriptionsManagerExtensions
     {
-        public static string GetEventKey<T>(this IEventBusSubscriptionsManager subscriptionsManager)
-            => subscriptionsManager.GetEventKey(typeof(T));
+        public static string GetDefaultEventKey<T>(this IEventBusSubscriptionsManager subscriptionsManager)
+            => subscriptionsManager.GetDefaultEventKey(typeof(T));
 
-        public static string GetEventKey(this IEventBusSubscriptionsManager subscriptionsManager, IntegrationEvent @event)
-    => subscriptionsManager.GetEventKey(@event.GetType());
     }
 }

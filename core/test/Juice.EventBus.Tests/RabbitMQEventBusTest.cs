@@ -111,77 +111,28 @@ namespace Juice.EventBus.Tests
                         options.ExchangeType = "topic";
                     });
 
+                services.AddSingleton<HandledService>();
+                services.AddTransient<LogEventHandler>();
             });
 
             using var scope = resolver.ServiceProvider.CreateScope();
             var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
+            var handledService = scope.ServiceProvider.GetRequiredService<HandledService>();
+
+            eventBus.Subscribe<LogEvent, LogEventHandler>("kernel.*");
 
             await eventBus.PublishAsync(new LogEvent { Facility = "auth", Serverty = LogLevel.Error });
+            await Task.Delay(TimeSpan.FromSeconds(1));
+
+            handledService.Handlers.Should().BeEmpty();
+
             await eventBus.PublishAsync(new LogEvent { Facility = "kernel", Serverty = LogLevel.Error });
             await eventBus.PublishAsync(new LogEvent { Facility = "kernel", Serverty = LogLevel.Information });
 
             await Task.Delay(TimeSpan.FromSeconds(1));
+            handledService.Handlers.Should().HaveCount(2);
         }
 
-        [Fact]
-        public void Topic_should_match()
-        {
-
-            var key = ToMatchKey("kernel.*");
-            _output.WriteLine(key);
-            RabbitMQUtils.IsTopicMatch("kernel.info", key).Should().BeTrue();
-            RabbitMQUtils.IsTopicMatch("kernel.info.x", key).Should().BeFalse();
-            RabbitMQUtils.IsTopicMatch("kernel", key).Should().BeFalse();
-            RabbitMQUtils.IsTopicMatch("x.kernel.info", key).Should().BeFalse();
-
-            key = ToMatchKey("kernel.*.#");
-            _output.WriteLine(key);
-            RabbitMQUtils.IsTopicMatch("kernel.info", key).Should().BeTrue();
-            RabbitMQUtils.IsTopicMatch("kernel.info.x", key).Should().BeTrue();
-            RabbitMQUtils.IsTopicMatch("kernel", key).Should().BeFalse();
-            RabbitMQUtils.IsTopicMatch("x.kernel.info", key).Should().BeFalse();
-
-            key = ToMatchKey("kernel.*.*");
-            _output.WriteLine(key);
-            RabbitMQUtils.IsTopicMatch("kernel.info", key).Should().BeFalse();
-            RabbitMQUtils.IsTopicMatch("kernel.info.x", key).Should().BeTrue();
-            RabbitMQUtils.IsTopicMatch("kernel.info.x.y", key).Should().BeFalse();
-            RabbitMQUtils.IsTopicMatch("kernel", key).Should().BeFalse();
-            RabbitMQUtils.IsTopicMatch("x.kernel.info", key).Should().BeFalse();
-
-            key = ToMatchKey("*.kernel.*");
-            _output.WriteLine(key);
-            RabbitMQUtils.IsTopicMatch("x.kernel.info", key).Should().BeTrue();
-            RabbitMQUtils.IsTopicMatch("kernel.info", key).Should().BeFalse();
-            RabbitMQUtils.IsTopicMatch("kernel.info.x", key).Should().BeFalse();
-
-            key = ToMatchKey("#.kernel.*");
-            _output.WriteLine(key);
-            RabbitMQUtils.IsTopicMatch("x.kernel.info", key).Should().BeTrue();
-            RabbitMQUtils.IsTopicMatch("kernel.info", key).Should().BeTrue();
-            RabbitMQUtils.IsTopicMatch("kernel.info.x", key).Should().BeFalse();
-
-            key = ToMatchKey("kernel.#.info.*");
-            _output.WriteLine(key);
-            RabbitMQUtils.IsTopicMatch("x.kernel.info", key).Should().BeFalse();
-            RabbitMQUtils.IsTopicMatch("kernel.info", key).Should().BeFalse();
-            RabbitMQUtils.IsTopicMatch("kernel.x.info.y", key).Should().BeTrue();
-            RabbitMQUtils.IsTopicMatch("kernel.x.y.info.z", key).Should().BeTrue();
-            RabbitMQUtils.IsTopicMatch("kernel.info.x", key).Should().BeTrue();
-            RabbitMQUtils.IsTopicMatch("kernel.info.x.y", key).Should().BeFalse();
-        }
-        private string ToMatchKey(string key)
-        {
-            return key;
-        }
-    }
-
-    public record LogEvent : IntegrationEvent
-    {
-        public LogLevel Serverty { get; set; }
-        public string Facility { get; set; }
-
-        public override string GetEventKey() => (Facility + "." + Serverty).ToLower();
     }
 
 }

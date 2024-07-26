@@ -1,5 +1,6 @@
 ﻿using Juice.EventBus;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -8,12 +9,16 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// </summary>
         /// <param name="services"></param>
+        /// <param name="topicSupport"></param>
         /// <returns></returns>
-        public static IServiceCollection RegisterInMemoryEventBus(this IServiceCollection services)
+        public static IServiceCollection RegisterInMemoryEventBus(this IServiceCollection services, bool topicSupport = true)
         {
             services.AddIntegrationEventTypesService();
 
-            services.AddSingleton<IEventBusSubscriptionsManager, InMemoryEventBusSubscriptionsManager>();
+            services.AddSingleton<IEventBusSubscriptionsManager>(sp => {
+                var logger = sp.GetRequiredService<ILogger<InMemoryEventBusSubscriptionsManager>>();
+                return new InMemoryEventBusSubscriptionsManager(logger, topicSupport);
+            });
 
             services.AddSingleton<IEventBus, InMemoryEventBus>();
 

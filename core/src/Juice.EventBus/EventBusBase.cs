@@ -20,7 +20,7 @@ namespace Juice.EventBus
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            var eventName = key ?? SubsManager.GetEventKey<T>();
+            var eventName = key ?? SubsManager.GetDefaultEventKey<T>();
             Logger.LogInformation("Subscribing event {EventName} with {EventHandler}", eventName, typeof(TH).GetGenericTypeName());
 
             SubsManager.AddSubscription<T, TH>(key);
@@ -31,7 +31,7 @@ namespace Juice.EventBus
             where T : IntegrationEvent
             where TH : IIntegrationEventHandler<T>
         {
-            var eventName = SubsManager.GetEventKey<T>();
+            var eventName = SubsManager.GetDefaultEventKey<T>();
 
             Logger.LogInformation("Unsubscribing event {EventName} for hanler {Handler}", eventName, typeof(TH).GetGenericTypeName());
 

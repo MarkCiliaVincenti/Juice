@@ -216,7 +216,7 @@ namespace Juice.EventBus.RabbitMQ
         #region Subscribe/UnSubscribe
         public override void Subscribe<T, TH>(string? key = default)
         {
-            var eventName = key ?? SubsManager.GetEventKey<T>();
+            var eventName = key ?? SubsManager.GetDefaultEventKey<T>();
 
             DoInternalSubscription(eventName);
 

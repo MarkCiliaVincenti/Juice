@@ -1,8 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Juice.EventBus.RabbitMQ
+namespace Juice.EventBus
 {
-    public static class RabbitMQUtils
+    public static class RoutingKeyUtils
     {
         public static bool IsTopicMatch(string eventRoutingKey, string consumeRoutingKey)
         {
