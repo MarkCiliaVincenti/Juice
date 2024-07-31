@@ -54,7 +54,7 @@ namespace Juice.Domain
         #endregion
     }
 
-    public abstract class DynamicEntity<TKey> : DynamicObject, IDynamic, IIdentifiable<TKey>
+    public abstract class DynamicEntity<TKey> : DynamicEntity, IIdentifiable<TKey>
         where TKey : IEquatable<TKey>
     {
 
@@ -86,6 +86,10 @@ namespace Juice.Domain
 
         #endregion
 
+    }
+
+    public abstract class DynamicEntity : DynamicObject, IDynamic
+    {
         #region Dynamic
 
         [NotMapped]
