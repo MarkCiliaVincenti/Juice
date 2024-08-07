@@ -35,8 +35,8 @@ namespace Juice.MediatR.RequestManager.EF
             }
         }
 
-        public async Task<bool> TryCreateRequestForCommandAsync<T, R>(Guid id)
-            where T : IRequest<R>
+        public async Task<bool> TryCreateRequestForCommandAsync<T>(Guid id)
+            where T : IBaseRequest
         {
             // retry failed or interupted conmmands
             if (await _context.ClientRequests.AnyAsync(r => r.Id == id
@@ -55,7 +55,7 @@ namespace Juice.MediatR.RequestManager.EF
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception)
+            catch (DbUpdateException)
             {
                 return false;
             }

@@ -65,8 +65,8 @@ namespace Juice.MediatR.RequestManager.Redis
                 }
             }
         }
-        public async Task<bool> TryCreateRequestForCommandAsync<T, R>(Guid id)
-            where T : IRequest<R>
+        public async Task<bool> TryCreateRequestForCommandAsync<T>(Guid id)
+            where T : IBaseRequest
         {
             var key = typeof(T).Name + ":" + id.ToString();
             var flag = await Connection.GetDatabase().StringSetAsync(key, "", TimeSpan.FromMinutes(15), When.NotExists);

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 namespace Juice.MediatR
 {
     public abstract class IdentifiedCommandHandlerBase<T, R>
-        where T : IRequest<R>
+        where T : IBaseRequest
     {
         protected readonly IMediator _mediator;
         protected readonly IRequestManager _requestManager;
@@ -25,46 +25,76 @@ namespace Juice.MediatR
 
             var commandName = command.GetGenericTypeName();
 
-            var (idProperty, commandId) = ExtractInfo(command);
+            var (idProperty, commandId) = ExtractDebugInfo(command);
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug(
                     "----- Sending command: {CommandName} - {IdProperty}: {CommandId} ({@Command})",
                     commandName,
-                    idProperty,
-                    commandId,
+                    idProperty ?? "ExtractDebugInfo not implemented",
+                    commandId ?? "ExtractDebugInfo not implemented",
                     command);
             }
 
             // Send the embeded business command to mediator so it runs its related CommandHandler 
-            var result = await _mediator.Send(command, cancellationToken);
+            var result =
+                command is IRequest<R> requestWithResult ? await _mediator.Send(requestWithResult, cancellationToken)
+                : command is IRequest request ?  await SendWrapperAsync(request, cancellationToken)
+                : throw new InvalidOperationException($"Command {commandName} does not implement IRequest<R> or IRequest<IOperationResult<R>> or IRequest");
+                ;
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug(
                     "----- Command result: {@Result} - {CommandName} - {IdProperty}: {CommandId} ({@Command})",
                     result,
                     commandName,
-                    idProperty,
-                    commandId,
+                    idProperty ?? "ExtractDebugInfo not implemented",
+                    commandId ?? "ExtractDebugInfo not implemented",
                     command);
             }
-            await _requestManager.TryCompleteRequestAsync(messageId, true);
             return result;
         }
 
-        protected abstract (string IdProperty, string CommandId) ExtractInfo(T command);
+        private async Task<R> SendWrapperAsync(IRequest command, CancellationToken cancellationToken)
+        {
+            try { 
+                await _mediator.Send(command, cancellationToken);
+                return (R) Convert.ChangeType((IOperationResult) OperationResult.Success, typeof(R));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error sending command: {CommandName}", command.GetGenericTypeName());
+                return (R)Convert.ChangeType((IOperationResult) OperationResult.Failed(ex), typeof(R));
+            }
+        }
+
+        /// <summary>
+        /// Extracts debug information from the command to be used in logging
+        /// </summary>
+        /// <param name="command"></param>
+        /// <returns></returns>
+        protected virtual (string? IdProperty, string? CommandId) ExtractDebugInfo(T command)
+            => (default, default);
+
+
+        /// <summary>
+        /// Creates the result value to return if a previous request was found
+        /// </summary>
+        /// <returns></returns>
+        protected abstract Task<R> CreateResultForDuplicatedRequestAsync(T message);
 
     }
+
     /// <summary>
+    /// <para>Handle <see cref="IdentifiedCommand{TRequest}"/></para>
     /// Provides a base implementation for handling duplicate request and ensuring idempotent updates, in the cases where
     /// a requestid sent by client is used to detect duplicate requests.
     /// </summary>
-    /// <typeparam name="T">Type of the command handler that performs the operation if request is not duplicated</typeparam>
-    /// <typeparam name="R">Return value of the inner command handler</typeparam>
-    public abstract class IdentifiedCommandHandler<T>
-        : IdentifiedCommandHandlerBase<T, IOperationResult?>
-        , IRequestHandler<IdentifiedCommand<T>, IOperationResult?>
-        where T : IRequest<IOperationResult>
+    /// <typeparam name="TRequest">Type of the command handler that performs the operation if request is not duplicated</typeparam>
+    public abstract class IdentifiedCommandHandler<TRequest>
+        : IdentifiedCommandHandlerBase<TRequest, IOperationResult>,
+        IRequestHandler<IdentifiedCommand<TRequest>>
+        where TRequest : IRequest
     {
 
         public IdentifiedCommandHandler(
@@ -72,14 +102,9 @@ namespace Juice.MediatR
             IRequestManager requestManager,
             ILogger logger) : base(mediator, requestManager, logger)
         {
-
+           
         }
 
-        /// <summary>
-        /// Creates the result value to return if a previous request was found
-        /// </summary>
-        /// <returns></returns>
-        protected abstract Task<IOperationResult?> CreateResultForDuplicateRequestAsync(IdentifiedCommand<T> message);
 
         /// <summary>
         /// This method handles the command. It just ensures that no other request exists with the same ID, and if this is the case
@@ -87,40 +112,42 @@ namespace Juice.MediatR
         /// </summary>
         /// <param name="message">IdentifiedCommand which contains both original command & request ID</param>
         /// <returns>Return value of inner command or default value if request same ID was found</returns>
-        public async Task<IOperationResult> Handle(IdentifiedCommand<T> message, CancellationToken cancellationToken)
+        public async Task Handle(IdentifiedCommand<TRequest> message, CancellationToken cancellationToken)
         {
 
-            var created = await _requestManager.TryCreateRequestForCommandAsync<T, IOperationResult>(message.Id);
+            var created = await _requestManager.TryCreateRequestForCommandAsync<TRequest>(message.Id);
             if (!created)
             {
-                _logger.LogInformation("Return result for duplicated request.");
-                return await CreateResultForDuplicateRequestAsync(message);
+                var result = await CreateResultForDuplicatedRequestAsync(message.Command);
+                if (!result.Succeeded)
+                {
+                    throw new Exception($"Request for {message.Command.GetGenericTypeName()} failed. {result.Message}");
+                }
+                return;
             }
             try
             {
-                return await DispatchAsync(message.Command, message.Id, cancellationToken);
+                await DispatchAsync(message.Command, message.Id, cancellationToken);
+                await _requestManager.TryCompleteRequestAsync(message.Id, true);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await _requestManager.TryCompleteRequestAsync(message.Id, false);
-                return OperationResult.Failed(ex);
+                throw;
             }
         }
 
     }
 
     /// <summary>
-    /// NOTE: If R is <see cref="IOperationResult"/> use <see cref="IdentifiedCommand{T}"/> instead.<para></para>
+    /// <para>Handle <see cref="IdentifiedCommand{TRequest,TResponse}"/></para>
     /// Provides a base implementation for handling duplicate request and ensuring idempotent updates, in the cases where
     /// a requestid sent by client is used to detect duplicate requests.
     /// </summary>
-    /// <typeparam name="T">Type of the command handler that performs the operation if request is not duplicated</typeparam>
-    /// <typeparam name="R">Return value of the inner command handler.</typeparam>
-    public abstract class IdentifiedCommandHandler<T, R> :
-        IdentifiedCommandHandlerBase<T, R>,
-        IRequestHandler<IdentifiedCommand<T, R>, IOperationResult<R?>>
-        where T : IRequest<R>
-        // where R is not IOperationResult
+    public abstract class IdentifiedCommandHandler<TRequest, TResponse>
+        : IdentifiedCommandHandlerBase<TRequest, TResponse>,
+        IRequestHandler<IdentifiedCommand<TRequest, TResponse>, TResponse>
+        where TRequest : IRequest<TResponse>
     {
 
         public IdentifiedCommandHandler(
@@ -128,14 +155,8 @@ namespace Juice.MediatR
             IRequestManager requestManager,
             ILogger logger) : base(mediator, requestManager, logger)
         {
+           
         }
-
-
-        /// <summary>
-        /// Creates the result value to return if a previous request was found
-        /// </summary>
-        /// <returns></returns>
-        protected abstract Task<R?> CreateResultForDuplicateRequestAsync(IdentifiedCommand<T, R> message);
 
         /// <summary>
         /// This method handles the command. It just ensures that no other request exists with the same ID, and if this is the case
@@ -143,80 +164,24 @@ namespace Juice.MediatR
         /// </summary>
         /// <param name="message">IdentifiedCommand which contains both original command & request ID</param>
         /// <returns>Return value of inner command or default value if request same ID was found</returns>
-        public async Task<IOperationResult<R?>> Handle(IdentifiedCommand<T, R> message, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(IdentifiedCommand<TRequest, TResponse> message, CancellationToken cancellationToken)
         {
 
-            var created = await _requestManager.TryCreateRequestForCommandAsync<T, R>(message.Id);
+            var created = await _requestManager.TryCreateRequestForCommandAsync<TRequest>(message.Id);
             if (!created)
             {
-                var data = await CreateResultForDuplicateRequestAsync(message);
-                return OperationResult.Result(data);
+                return await CreateResultForDuplicatedRequestAsync(message.Command);
             }
             try
             {
-                var result = await DispatchAsync(message.Command, message.Id, cancellationToken);
-                return OperationResult.Result(result);
+                var data = await DispatchAsync(message.Command, message.Id, cancellationToken);
+                await _requestManager.TryCompleteRequestAsync(message.Id, true);
+                return data;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await _requestManager.TryCompleteRequestAsync(message.Id, false);
-                return OperationResult.Failed<R>(ex);
-            }
-        }
-
-    }
-
-    /// <summary>
-    /// Provides a base implementation for handling duplicate request and ensuring idempotent updates, in the cases where
-    /// a requestid sent by client is used to detect duplicate requests.
-    /// </summary>
-    /// <typeparam name="T">Type of the command handler that performs the operation if request is not duplicated</typeparam>
-    /// <typeparam name="R">Return value of the inner command handler</typeparam>
-    public abstract class IdentifiedCommandHandler<T, R, D>
-        : IdentifiedCommandHandlerBase<T, R>,
-        IRequestHandler<IdentifiedCommand<T, R, D>, R>
-        where T : IRequest<R>
-        where R : IOperationResult<D>
-    {
-
-        public IdentifiedCommandHandler(
-            IMediator mediator,
-            IRequestManager requestManager,
-            ILogger logger) : base(mediator, requestManager, logger)
-        {
-
-        }
-
-
-        /// <summary>
-        /// Creates the result value to return if a previous request was found
-        /// </summary>
-        /// <returns></returns>
-        protected abstract Task<D> CreateResultForDuplicateRequestAsync(IdentifiedCommand<T, R, D> message);
-
-        /// <summary>
-        /// This method handles the command. It just ensures that no other request exists with the same ID, and if this is the case
-        /// just enqueues the original inner command.
-        /// </summary>
-        /// <param name="message">IdentifiedCommand which contains both original command & request ID</param>
-        /// <returns>Return value of inner command or default value if request same ID was found</returns>
-        public async Task<R> Handle(IdentifiedCommand<T, R, D> message, CancellationToken cancellationToken)
-        {
-
-            var created = await _requestManager.TryCreateRequestForCommandAsync<T, R>(message.Id);
-            if (!created)
-            {
-                var data = await CreateResultForDuplicateRequestAsync(message);
-                return (R)Convert.ChangeType(OperationResult.Result(data), typeof(R));
-            }
-            try
-            {
-                return await DispatchAsync(message.Command, message.Id, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                await _requestManager.TryCompleteRequestAsync(message.Id, false);
-                return (R)Convert.ChangeType(OperationResult.Failed<R>(ex), typeof(R));
+                throw;
             }
         }
 
