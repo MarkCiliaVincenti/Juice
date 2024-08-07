@@ -392,11 +392,13 @@ namespace Juice.MediatR.Tests
 
                 services.AddMediatR(options =>
                 {
-                    options.RegisterServicesFromAssemblyContaining<RequestHandler>();
+                    options.RegisterServicesFromAssemblyContaining(typeof(IdentifiedCommand<>));
                 });
 
                 services.AddDefaultStringIdGenerator();
                 services.AddSingleton<SharedService>();
+
+                services.AddIdentifiedCommandHandler<OperationWithResult, IOperationResult<string>, OperationWithResultHandler, OperationWithResultIdentifiedCommandHandler>();
 
                 services.AddEFMediatorRequestManager(configuration, options =>
                 {
