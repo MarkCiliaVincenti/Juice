@@ -36,7 +36,6 @@ namespace Juice
         /// Create a failed <see cref="OperationResult"/> with an <see cref="System.Exception"/>
         /// </summary>
         /// <param name="ex"></param>
-        /// <param name="errors"></param>
         /// <returns></returns>
         public static OperationResult Failed(Exception? ex)
             => new()
@@ -49,7 +48,7 @@ namespace Juice
         /// Create a failed <see cref="OperationResult"/> with an <see cref="System.Exception"/> and message
         /// </summary>
         /// <param name="ex"></param>
-        /// <param name="errors"></param>
+        /// <param name="message"></param>
         /// <returns></returns>
         public static OperationResult Failed(Exception? ex, string? message)
             => new()
@@ -62,8 +61,7 @@ namespace Juice
         /// <summary>
         /// Create a failed <see cref="OperationResult"/> with message
         /// </summary>
-        /// <param name="ex"></param>
-        /// <param name="errors"></param>
+        /// <param name="message"></param>
         /// <returns></returns>
         public static OperationResult Failed(string? message)
             => new()
@@ -80,7 +78,6 @@ namespace Juice
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="ex"></param>
-        /// <param name="errors"></param>
         /// <returns></returns>
         public static OperationResult<T> Failed<T>(Exception? ex)
             => new()
@@ -91,7 +88,7 @@ namespace Juice
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="ex"></param>
-        /// <param name="errors"></param>
+        /// <param name="message"></param>
         /// <returns></returns>
         public static OperationResult<T> Failed<T>(Exception? ex, string? message)
             => new()
@@ -101,8 +98,7 @@ namespace Juice
         /// Create a failed <see cref="OperationResult{T}"/> with message
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="ex"></param>
-        /// <param name="errors"></param>
+        /// <param name="message"></param>
         /// <returns></returns>
         public static OperationResult<T> Failed<T>(string? message)
             => new()
@@ -114,11 +110,11 @@ namespace Juice
         /// <param name="data"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static OperationResult<T> Result<T>(T data, string? message = null)
+        public static OperationResult<T> Result<T>(T? data, string? message = null)
             => new()
             { Succeeded = true, Data = data, Message = message };
 
-        public static OperationResult<T> FromJson<T>(string json) => JsonConvert.DeserializeObject<OperationResult<T>>(json);
+        public static OperationResult<T>? FromJson<T>(string json) => JsonConvert.DeserializeObject<OperationResult<T>>(json);
 
         #endregion
 

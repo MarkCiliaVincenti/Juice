@@ -68,50 +68,53 @@ namespace Juice.MediatR.Tests
             _testOutput.WriteLine("All tasks are started");
             await Task.Delay(1000);
         }
+
+        private class SharedService
+        {
+            public string? User { get; set; }
+        }
+
+        private class NoticeA : INotification
+        {
+            public DateTimeOffset DateTime { get; } = DateTimeOffset.Now;
+        }
+
+        private class NoticeAHandler : INotificationHandler<NoticeA>
+        {
+            private ILogger _logger;
+            private SharedService _sharedService;
+            public NoticeAHandler(ILogger<NoticeAHandler> logger, SharedService sharedService)
+            {
+                this._logger = logger;
+                _sharedService = sharedService;
+            }
+            public async Task Handle(NoticeA notification, CancellationToken cancellationToken)
+            {
+                await Task.Delay(200);
+                _logger.LogInformation("Notice created at {Created} and processed after {After} milliseconds. User: {User}",
+                    notification.DateTime, (DateTimeOffset.Now - notification.DateTime).TotalMilliseconds, _sharedService.User ?? "");
+            }
+        }
+
+        private class CmdB : IRequest<int>
+        {
+            public DateTimeOffset DateTime { get; } = DateTimeOffset.Now;
+        }
+        private class CmdBHandler : IRequestHandler<CmdB, int>
+        {
+            private ILogger _logger;
+            public CmdBHandler(ILogger<CmdBHandler> logger)
+            {
+                _logger = logger;
+            }
+            public async Task<int> Handle(CmdB request, CancellationToken cancellationToken)
+            {
+                await Task.Delay(200);
+                _logger.LogInformation("Command created at {Created} and processed after {After} milliseconds", request.DateTime, (DateTimeOffset.Now - request.DateTime).TotalMilliseconds);
+                return 0;
+            }
+        }
+
     }
 
-    public class NoticeA : INotification
-    {
-        public DateTimeOffset DateTime { get; } = DateTimeOffset.Now;
-    }
-    public class NoticeAHandler : INotificationHandler<NoticeA>
-    {
-        private ILogger _logger;
-        private SharedService _sharedService;
-        public NoticeAHandler(ILogger<NoticeAHandler> logger, SharedService sharedService)
-        {
-            this._logger = logger;
-            _sharedService = sharedService;
-        }
-        public async Task Handle(NoticeA notification, CancellationToken cancellationToken)
-        {
-            await Task.Delay(200);
-            _logger.LogInformation("Notice created at {Created} and processed after {After} milliseconds. User: {User}",
-                notification.DateTime, (DateTimeOffset.Now - notification.DateTime).TotalMilliseconds, _sharedService.User ?? "");
-        }
-    }
-
-    public class CmdB : IRequest<int>
-    {
-        public DateTimeOffset DateTime { get; } = DateTimeOffset.Now;
-    }
-    public class CmdBHandler : IRequestHandler<CmdB, int>
-    {
-        private ILogger _logger;
-        public CmdBHandler(ILogger<CmdBHandler> logger)
-        {
-            _logger = logger;
-        }
-        public async Task<int> Handle(CmdB request, CancellationToken cancellationToken)
-        {
-            await Task.Delay(200);
-            _logger.LogInformation("Command created at {Created} and processed after {After} milliseconds", request.DateTime, (DateTimeOffset.Now - request.DateTime).TotalMilliseconds);
-            return 0;
-        }
-    }
-
-    public class SharedService
-    {
-        public string? User { get; set; }
-    }
 }
