@@ -11,11 +11,12 @@ namespace Juice.MediatR.RequestManager.EF
             _context = context;
         }
 
-        public async Task TryCompleteRequestAsync(Guid id, bool success)
+        public async Task TryCompleteRequestAsync<T>(Guid id, bool success)
+            where T : IBaseRequest
         {
             try
             {
-                var request = await _context.ClientRequests.FindAsync(id);
+                var request = await _context.ClientRequests.FindAsync(id, typeof(T).Name);
                 if (request != null)
                 {
                     if (success)
@@ -40,12 +41,13 @@ namespace Juice.MediatR.RequestManager.EF
         {
             // retry failed or interupted conmmands
             if (await _context.ClientRequests.AnyAsync(r => r.Id == id
+                && r.Name == typeof(T).Name
                 && (r.State == RequestState.ProcessedFailed
                 || (r.State == RequestState.New && r.Time < DateTimeOffset.Now.AddSeconds(-15)))))
             {
                 return true;
             }
-            if (await _context.ClientRequests.AnyAsync(r => r.Id == id))
+            if (await _context.ClientRequests.AnyAsync(r => r.Id == id && r.Name == typeof(T).Name))
             {
                 return false;
             }

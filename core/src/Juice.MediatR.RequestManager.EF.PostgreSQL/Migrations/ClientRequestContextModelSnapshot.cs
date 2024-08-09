@@ -17,7 +17,7 @@ namespace Juice.MediatR.RequestManager.EF.PostgreSQL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.1")
+                .HasAnnotation("ProductVersion", "7.0.20")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -25,15 +25,14 @@ namespace Juice.MediatR.RequestManager.EF.PostgreSQL.Migrations
             modelBuilder.Entity("Juice.MediatR.RequestManager.EF.ClientRequest", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTimeOffset?>("CompletedTime")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<int>("State")
                         .HasColumnType("integer");
@@ -41,9 +40,9 @@ namespace Juice.MediatR.RequestManager.EF.PostgreSQL.Migrations
                     b.Property<DateTimeOffset>("Time")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("sysdatetimeoffset()");
+                        .HasDefaultValue(new DateTimeOffset(new DateTime(2024, 8, 9, 13, 39, 54, 702, DateTimeKind.Unspecified).AddTicks(6080), new TimeSpan(0, 7, 0, 0, 0)));
 
-                    b.HasKey("Id");
+                    b.HasKey("Id", "Name");
 
                     b.ToTable("ClientRequest", "App");
                 });

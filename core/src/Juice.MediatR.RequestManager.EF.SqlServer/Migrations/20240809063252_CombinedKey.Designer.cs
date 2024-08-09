@@ -4,6 +4,7 @@ using Juice.MediatR.RequestManager.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Juice.MediatR.RequestManager.EF.SqlServer.Migrations
 {
     [DbContext(typeof(ClientRequestContext))]
-    partial class ClientRequestContextModelSnapshot : ModelSnapshot
+    [Migration("20240809063252_CombinedKey")]
+    partial class CombinedKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

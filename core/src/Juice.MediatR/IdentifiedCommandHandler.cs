@@ -128,11 +128,11 @@ namespace Juice.MediatR
             try
             {
                 await DispatchAsync(message.Command, message.Id, cancellationToken);
-                await _requestManager.TryCompleteRequestAsync(message.Id, true);
+                await _requestManager.TryCompleteRequestAsync<TRequest>(message.Id, true);
             }
             catch (Exception)
             {
-                await _requestManager.TryCompleteRequestAsync(message.Id, false);
+                await _requestManager.TryCompleteRequestAsync<TRequest>(message.Id, false);
                 throw;
             }
         }
@@ -175,12 +175,12 @@ namespace Juice.MediatR
             try
             {
                 var data = await DispatchAsync(message.Command, message.Id, cancellationToken);
-                await _requestManager.TryCompleteRequestAsync(message.Id, true);
+                await _requestManager.TryCompleteRequestAsync<TRequest>(message.Id, true);
                 return data;
             }
             catch (Exception)
             {
-                await _requestManager.TryCompleteRequestAsync(message.Id, false);
+                await _requestManager.TryCompleteRequestAsync<TRequest>(message.Id, false);
                 throw;
             }
         }

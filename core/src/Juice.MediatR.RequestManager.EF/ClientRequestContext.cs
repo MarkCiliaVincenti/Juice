@@ -24,9 +24,10 @@ namespace Juice.MediatR.RequestManager.EF
         {
             builder.ToTable("ClientRequest", Schema);
 
-            builder.HasKey(e => e.Id);
+            builder.HasKey("Id", "Name");
 
             builder.Property(e => e.Name)
+                .HasMaxLength(200)
                 .IsRequired();
 
             builder.Property(e => e.Time)
