@@ -333,7 +333,7 @@ namespace Juice.MediatR.Tests
                 services.AddDefaultStringIdGenerator();
                 services.AddSingleton<SharedService>();
 
-                services.AddEFMediatorRequestManager(configuration, options =>
+                services.AddEFMediatorRequestManager<TestContext>(configuration, options =>
                 {
                     options.DatabaseProvider = "PostgreSQL";
                     options.Schema = schema;
@@ -535,7 +535,7 @@ namespace Juice.MediatR.Tests
         private class OperationIdentifiedCommandHandler : IdentifiedCommandHandler<Operation, IOperationResult>
         {
             private readonly SharedService _sharedService;
-            public OperationIdentifiedCommandHandler(IMediator mediator, IRequestManager requestManager,
+            public OperationIdentifiedCommandHandler(IMediator mediator, IRequestManager<TestContext> requestManager,
                 ILogger<OperationIdentifiedCommandHandler> logger, SharedService sharedService)
                 : base(mediator, requestManager, logger)
             {
