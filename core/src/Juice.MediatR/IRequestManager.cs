@@ -7,7 +7,8 @@ namespace Juice.MediatR
         Task<bool> TryCreateRequestForCommandAsync<T>(Guid id)
             where T : IBaseRequest;
 
-        Task TryCompleteRequestAsync(Guid id, bool success);
+        Task TryCompleteRequestAsync<T>(Guid id, bool success)
+            where T : IBaseRequest;
     }
 
     public interface IRequestManager : IRequestManagerBase

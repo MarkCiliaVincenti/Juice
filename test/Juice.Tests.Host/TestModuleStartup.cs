@@ -1,6 +1,4 @@
 ﻿using Juice.EventBus;
-using Juice.EventBus.RabbitMQ;
-using Juice.Extensions.Options;
 using Juice.Modular;
 using Juice.Tests.Host.IntegrationEvents;
 using Microsoft.AspNetCore.DataProtection;

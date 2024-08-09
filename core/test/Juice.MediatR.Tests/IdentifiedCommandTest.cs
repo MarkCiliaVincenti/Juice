@@ -22,8 +22,8 @@ namespace Juice.MediatR.Tests
     [TestCaseOrderer("Juice.XUnit.PriorityOrderer", "Juice.XUnit")]
     public class IdentifiedCommandTest
     {
-        private readonly string TestSchema1 = "Contents";
-        private readonly string TestSchema2 = "Cms";
+        private readonly string ContentSchema = "Contents";
+        private readonly string CmsSchema = "Cms";
 
         private ITestOutputHelper _testOutput;
         public IdentifiedCommandTest(ITestOutputHelper testOutput)
@@ -40,7 +40,7 @@ namespace Juice.MediatR.Tests
             {
                 CurrentDirectory = AppContext.BaseDirectory
             };
-            var schema = TestSchema1;
+            var schema = ContentSchema;
 
             resolver.ConfigureServices(services =>
             {
@@ -85,7 +85,7 @@ namespace Juice.MediatR.Tests
             {
                 CurrentDirectory = AppContext.BaseDirectory
             };
-            var schema = TestSchema2;
+            var schema = CmsSchema;
 
             resolver.ConfigureServices(services =>
             {
@@ -131,7 +131,7 @@ namespace Juice.MediatR.Tests
                 CurrentDirectory = AppContext.BaseDirectory
             };
 
-            var schema = TestSchema2;
+            var schema = CmsSchema;
 
             resolver.ConfigureServices(services =>
             {
@@ -180,7 +180,7 @@ namespace Juice.MediatR.Tests
 
             Assert.True(ok);
 
-            await requestManager.TryCompleteRequestAsync(id, true);
+            await requestManager.TryCompleteRequestAsync<Request>(id, true);
 
         }
 
@@ -192,7 +192,7 @@ namespace Juice.MediatR.Tests
                 CurrentDirectory = AppContext.BaseDirectory
             };
 
-            var schema = TestSchema2;
+            var schema = CmsSchema;
 
             resolver.ConfigureServices(services =>
             {
@@ -250,7 +250,7 @@ namespace Juice.MediatR.Tests
                 CurrentDirectory = AppContext.BaseDirectory
             };
 
-            var schema = TestSchema2;
+            var schema = CmsSchema;
 
             resolver.ConfigureServices(services =>
             {
@@ -308,7 +308,7 @@ namespace Juice.MediatR.Tests
                 CurrentDirectory = AppContext.BaseDirectory
             };
 
-            var schema = TestSchema2;
+            var schema = CmsSchema;
 
             resolver.ConfigureServices(services =>
             {
@@ -373,7 +373,7 @@ namespace Juice.MediatR.Tests
                 CurrentDirectory = AppContext.BaseDirectory
             };
 
-            var schema = TestSchema2;
+            var schema = CmsSchema;
 
             resolver.ConfigureServices(services =>
             {

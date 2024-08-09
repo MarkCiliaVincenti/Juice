@@ -29,9 +29,15 @@ namespace Juice.MediatR.RequestManager.Redis
             configuration = options.Value;
         }
 
-        public async Task TryCompleteRequestAsync(Guid id, bool success)
+        private string GetKey<T>(Guid id)
         {
-            var key = "IdentifiedCommand:" + id.ToString();
+            return typeof(T).Name + ":" + id.ToString();
+        }
+
+        public async Task TryCompleteRequestAsync<T>(Guid id, bool success)
+            where T : IBaseRequest
+        {
+            var key = GetKey<T>(id);
 
             if (success)
             {
@@ -68,7 +74,7 @@ namespace Juice.MediatR.RequestManager.Redis
         public async Task<bool> TryCreateRequestForCommandAsync<T>(Guid id)
             where T : IBaseRequest
         {
-            var key = typeof(T).Name + ":" + id.ToString();
+            var key = GetKey<T>(id);
             var flag = await Connection.GetDatabase().StringSetAsync(key, "", TimeSpan.FromMinutes(15), When.NotExists);
             return flag;
         }
