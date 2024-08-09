@@ -8,11 +8,11 @@ namespace Juice.MediatR
         where T : IBaseRequest
     {
         protected readonly IMediator _mediator;
-        protected readonly IRequestManager _requestManager;
+        protected readonly IRequestManagerBase _requestManager;
         protected readonly ILogger _logger;
         public IdentifiedCommandHandlerBase(
             IMediator mediator,
-            IRequestManager requestManager,
+            IRequestManagerBase requestManager,
             ILogger logger)
         {
             _mediator = mediator;
@@ -99,7 +99,7 @@ namespace Juice.MediatR
 
         public IdentifiedCommandHandler(
             IMediator mediator,
-            IRequestManager requestManager,
+            IRequestManagerBase requestManager,
             ILogger logger) : base(mediator, requestManager, logger)
         {
            
@@ -152,7 +152,7 @@ namespace Juice.MediatR
 
         public IdentifiedCommandHandler(
             IMediator mediator,
-            IRequestManager requestManager,
+            IRequestManagerBase requestManager,
             ILogger logger) : base(mediator, requestManager, logger)
         {
            
