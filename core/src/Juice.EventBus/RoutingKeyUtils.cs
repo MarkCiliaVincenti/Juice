@@ -6,8 +6,13 @@ namespace Juice.EventBus
     {
         public static bool IsTopicMatch(string eventRoutingKey, string consumeRoutingKey)
         {
-            return Regex.IsMatch(eventRoutingKey, "^" + consumeRoutingKey.Replace(".", "\\.").Replace("*", "([^\\.]+){1}")
-                 .Replace("\\.#", "(\\.[^\\.]+)*").Replace("#\\.", "([^\\.]+\\.)*") + "$");
+            return Regex.IsMatch(eventRoutingKey, ToRouteMatchingKey(consumeRoutingKey));
+        }
+
+        public static string ToRouteMatchingKey(string consumeRoutingKey)
+        {
+            return "^" + consumeRoutingKey.Replace(".", "\\.").Replace("*", "([^\\.]+){1}")
+                 .Replace("\\.#", "(\\.[^\\.]+)*").Replace("#\\.", "([^\\.]+\\.)*") + "$";
         }
     }
 }

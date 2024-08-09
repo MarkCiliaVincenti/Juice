@@ -49,7 +49,7 @@ namespace Juice.MediatR.Tests
 
                 // Register DbContext class
 
-                services.AddEFMediatorRequestManager(configuration, options =>
+                services.AddEFMediatorRequestManager<Request>(configuration, options =>
                 {
                     options.DatabaseProvider = "SqlServer";
                     options.Schema = schema;
@@ -67,7 +67,7 @@ namespace Juice.MediatR.Tests
 
             });
 
-            var context = resolver.ServiceProvider.GetRequiredService<ClientRequestContext>();
+            var context = resolver.ServiceProvider.GetRequiredService<ClientRequestContext<Request>>();
             var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
 
             if (pendingMigrations.Any())

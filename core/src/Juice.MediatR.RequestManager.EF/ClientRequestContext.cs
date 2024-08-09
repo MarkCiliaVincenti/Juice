@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Juice.MediatR.RequestManager.EF
 {
-    public class ClientRequestContext : DbContext, ISchemaDbContext
+
+    public abstract class ClientRequestContextBase : DbContext, ISchemaDbContext
     {
-        public string? Schema { get; private set; }
-        public ClientRequestContext(DbOptions<ClientRequestContext> dbOptions,
-            DbContextOptions<ClientRequestContext> options) : base(options)
+        public string? Schema { get; protected set; }
+
+        protected ClientRequestContextBase(DbContextOptions options) : base(options)
         {
-            Schema = dbOptions?.Schema;
         }
 
         public DbSet<ClientRequest> ClientRequests { get; set; }
@@ -36,6 +36,24 @@ namespace Juice.MediatR.RequestManager.EF
             builder.Property(e => e.State)
                 .IsRequired();
 
+        }
+    }
+
+    public class ClientRequestContext : ClientRequestContextBase
+    {
+        public ClientRequestContext(DbOptions<ClientRequestContext> dbOptions,
+            DbContextOptions<ClientRequestContext> options) : base(options)
+        {
+            Schema = dbOptions.Schema;
+        }
+    }
+
+    public class ClientRequestContext<TContext> : ClientRequestContextBase
+    {
+        public ClientRequestContext(DbOptions<ClientRequestContext<TContext>> dbOptions,
+            DbContextOptions<ClientRequestContext<TContext>> options) : base(options)
+        {
+            Schema = dbOptions.Schema;
         }
     }
 }

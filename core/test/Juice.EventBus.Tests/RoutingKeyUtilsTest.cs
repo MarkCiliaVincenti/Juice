@@ -60,6 +60,9 @@ namespace Juice.EventBus.Tests
             RoutingKeyUtils.IsTopicMatch("kernel.x.y.info.z", key).Should().BeTrue();
             RoutingKeyUtils.IsTopicMatch("kernel.info.x", key).Should().BeTrue();
             RoutingKeyUtils.IsTopicMatch("kernel.info.x.y", key).Should().BeFalse();
+
+            _output.WriteLine(RoutingKeyUtils.ToRouteMatchingKey("job.#.pending"));
+            RoutingKeyUtils.IsTopicMatch("job.media.dummy.job.pending", "job.#.pending").Should().BeTrue();
         }
         private string ToMatchKey(string key)
         {
