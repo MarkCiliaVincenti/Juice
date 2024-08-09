@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Juice.MediatR.RequestManager.EF
 {
-    internal class RequestManager : IRequestManager
+    internal class RequestManagerBase : IRequestManagerBase
     {
-        private ClientRequestContext _context;
-        public RequestManager(ClientRequestContext context)
+        private ClientRequestContextBase _context;
+        public RequestManagerBase(ClientRequestContextBase context)
         {
             _context = context;
         }
@@ -59,6 +59,20 @@ namespace Juice.MediatR.RequestManager.EF
             {
                 return false;
             }
+        }
+    }
+
+    internal class RequestManager : RequestManagerBase, IRequestManager
+    {
+        public RequestManager(ClientRequestContext context) : base(context)
+        {
+        }
+    }
+
+    internal class RequestManager<TContext> : RequestManagerBase, IRequestManager<TContext>
+    {
+        public RequestManager(ClientRequestContext<TContext> context) : base(context)
+        {
         }
     }
 }
