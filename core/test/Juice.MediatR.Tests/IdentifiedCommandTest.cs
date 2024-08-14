@@ -49,7 +49,7 @@ namespace Juice.MediatR.Tests
 
                 // Register DbContext class
 
-                services.AddEFMediatorRequestManager<Request>(configuration, options =>
+                services.AddEFMediatorRequestManager(configuration, options =>
                 {
                     options.DatabaseProvider = "SqlServer";
                     options.Schema = schema;
@@ -67,7 +67,7 @@ namespace Juice.MediatR.Tests
 
             });
 
-            var context = resolver.ServiceProvider.GetRequiredService<ClientRequestContext<Request>>();
+            var context = resolver.ServiceProvider.GetRequiredService<ClientRequestContext>();
             var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
 
             if (pendingMigrations.Any())
@@ -76,6 +76,9 @@ namespace Juice.MediatR.Tests
                 Console.WriteLine("[ClientRequestContext] Applying pending migrations now");
                 await context.Database.MigrateAsync();
             }
+
+            var historyTable = await context.Database.GetAppliedMigrationsAsync();
+            historyTable.Count().Should().BeGreaterThan(0);
         }
 
         [IgnoreOnCIFact(DisplayName = "Cms schema migration"), TestPriority(9)]

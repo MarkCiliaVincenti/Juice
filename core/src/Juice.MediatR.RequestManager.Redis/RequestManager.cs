@@ -79,4 +79,10 @@ namespace Juice.MediatR.RequestManager.Redis
             return flag;
         }
     }
+    public class RequestManager<T> : RequestManager, IRequestManager<T>
+    {
+        public RequestManager(ILogger<RequestManager> logger, IOptions<RedisOptions> options) : base(logger, options)
+        {
+        }
+    }
 }
