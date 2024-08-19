@@ -67,6 +67,7 @@ namespace Juice.EventBus.Tests
                 eventBus.Subscribe<ContentPublishedIntegrationEvent, ContentPublishedIntegrationEventHandler1>();
 
                 await eventBus.PublishAsync(new ContentPublishedIntegrationEvent("Hello"));
+                _logger.LogInformation("Event published");
                 handledService.Handlers.Should().BeEmpty();
                 await Task.Delay(TimeSpan.FromSeconds(1));
                 handledService.Handlers.Should().Contain(nameof(ContentPublishedIntegrationEventHandler));
