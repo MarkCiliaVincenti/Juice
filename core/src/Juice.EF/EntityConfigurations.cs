@@ -11,7 +11,10 @@ namespace Juice.EF
     {
         public virtual void Configure(EntityTypeBuilder<T> builder)
         {
-            builder.Property(m => m.Name).HasMaxLength(Constants.NameLength).IsRequired();
+            if (builder.Property("Name")!=null)
+            {
+                builder.Property("Name").HasMaxLength(Constants.NameLength).IsRequired();
+            }
             if (builder.Property("Disabled") != null)
             {
                 builder.Property("Disabled").HasDefaultValue(false);
