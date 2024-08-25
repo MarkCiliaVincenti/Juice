@@ -60,5 +60,14 @@ namespace Juice.Tests.Host
             eventBus.Subscribe<TenantSettingsChangedIntegrationEvent, TenantSettingsChangedIntegrationEventHandler>();
             eventBus.Subscribe<LogEvent, LogEventHandler>("kernel.*");
         }
+
+        public override void OnShutdown(IServiceProvider serviceProvider, IWebHostEnvironment env)
+        {
+            var eventBus = serviceProvider.GetRequiredService<IEventBus>();
+
+            eventBus.Unsubscribe<TenantActivatedIntegrationEvent, TenantActivatedIntegrationEventHandler>();
+            eventBus.Unsubscribe<TenantSettingsChangedIntegrationEvent, TenantSettingsChangedIntegrationEventHandler>();
+            eventBus.Unsubscribe<LogEvent, LogEventHandler>("kernel.*");
+        }
     }
 }

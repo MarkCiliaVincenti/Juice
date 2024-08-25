@@ -19,7 +19,7 @@ namespace Juice.EventBus.RabbitMQ
 
         private IRabbitMQPersistentConnection _persistentConnection;
 
-        private IModel _consumerChannel;
+        private IModel? _consumerChannel;
         private string _queueName;
         private string _type;
         private readonly int _retryCount;
@@ -50,11 +50,11 @@ namespace Juice.EventBus.RabbitMQ
 
         #region Init consume channel and processing incoming event
 
-        private void SubsManager_OnEventRemoved(object sender, string eventName)
+        private void SubsManager_OnEventRemoved(object? sender, string eventName)
         {
-            if (!_persistentConnection.IsConnected)
+            if (!_persistentConnection.IsConnected && !_persistentConnection.TryConnect())
             {
-                _persistentConnection.TryConnect();
+                return;
             }
             using (var channel = _persistentConnection.CreateModel())
             {
@@ -66,7 +66,7 @@ namespace Juice.EventBus.RabbitMQ
 
                 if (SubsManager.IsEmpty)
                 {
-                    _consumerChannel.Close();
+                    _consumerChannel?.Close();
                 }
             }
 
@@ -91,11 +91,11 @@ namespace Juice.EventBus.RabbitMQ
                     // Even on exception we take the message off the queue.
                     // in a REAL WORLD app this should be handled with a Dead Letter Exchange (DLX). 
                     // For more information see: https://www.rabbitmq.com/dlx.html
-                    _consumerChannel.BasicAck(eventArgs.DeliveryTag, multiple: false);
+                    _consumerChannel?.BasicAck(eventArgs.DeliveryTag, multiple: false);
                 }
                 else
                 {
-                    _consumerChannel.BasicNack(eventArgs.DeliveryTag, multiple: true, requeue: true);
+                    _consumerChannel?.BasicNack(eventArgs.DeliveryTag, multiple: true, requeue: true);
                 }
             }
             catch (Exception ex)
@@ -129,11 +129,11 @@ namespace Juice.EventBus.RabbitMQ
             }
         }
 
-        private IModel CreateConsumerChannel()
+        private IModel? CreateConsumerChannel()
         {
-            if (!_persistentConnection.IsConnected)
+            if (!_persistentConnection.IsConnected && !_persistentConnection.TryConnect())
             {
-                _persistentConnection.TryConnect();
+                return null;
             }
 
             Logger.LogInformation("Creating RabbitMQ consumer channel. Broker: {Broker}.", BROKER_NAME);
@@ -158,9 +158,12 @@ namespace Juice.EventBus.RabbitMQ
             {
                 Logger.LogWarning(ea.Exception, "Recreating RabbitMQ consumer channel");
 
-                _consumerChannel.Dispose();
+                _consumerChannel?.Dispose();
                 _consumerChannel = CreateConsumerChannel();
-                StartBasicConsume();
+                if (_consumerChannel != null)
+                {
+                    StartBasicConsume();
+                }
             };
 
             return channel;
@@ -174,10 +177,30 @@ namespace Juice.EventBus.RabbitMQ
                 {
                     using var scope = _scopeFactory.CreateScope();
                     var subscriptions = SubsManager.GetHandlersForEvent(eventName);
-                    Logger.LogTrace("Found {count} handlers for event: {EventName}", subscriptions.Count(), eventName);
+                    if (Logger.IsEnabled(LogLevel.Trace))
+                    {
+                        Logger.LogTrace("Found {count} handlers for event: {EventName}", subscriptions.Count(), eventName);
+                    }
+
+                    var eventType = SubsManager.GetEventTypeByName(eventName);
+                    var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+
+                    var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
+                    if (integrationEvent == null)
+                    {
+                        Logger.LogWarning("Failed to deserialize message to {eventType}", eventType.Name);
+                        return false;
+                    }
+
                     var ok = false;
                     foreach (var subscription in subscriptions)
                     {
+                        if(!subscription.HandlerType.IsAssignableTo(concreteType))
+                        {
+                            Logger.LogWarning("Type {typeName} not assignable to {concreteType}", subscription.HandlerType.Name, concreteType.Name);
+
+                            continue;
+                        }
                         var handler = scope.ServiceProvider.GetService(subscription.HandlerType);
                         if (handler == null)
                         {
@@ -185,14 +208,10 @@ namespace Juice.EventBus.RabbitMQ
 
                             continue;
                         }
-                        var eventType = SubsManager.GetEventTypeByName(eventName);
-                        var integrationEvent = JsonConvert.DeserializeObject(message, eventType);
-                        var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
-
-                        await Task.Yield();
+                        
                         try
                         {
-                            await (Task)concreteType.GetMethod(nameof(IIntegrationEventHandler<IntegrationEvent>.HandleAsync)).Invoke(handler, new object[] { integrationEvent });
+                            await (Task)concreteType.GetMethod(nameof(IIntegrationEventHandler<IntegrationEvent>.HandleAsync))!.Invoke(handler, new object[] { integrationEvent! })!;
                             ok = true;
                         }
                         catch (Exception ex)
@@ -233,12 +252,12 @@ namespace Juice.EventBus.RabbitMQ
             var containsKey = SubsManager.HasSubscriptionsForEvent(eventName);
             if (!containsKey)
             {
-                if (!_persistentConnection.IsConnected)
+                if (!_persistentConnection.IsConnected && !_persistentConnection.TryConnect())
                 {
-                    _persistentConnection.TryConnect();
+                    return;
                 }
 
-                _consumerChannel.QueueBind(queue: _queueName,
+                _consumerChannel?.QueueBind(queue: _queueName,
                                 exchange: BROKER_NAME,
                                 routingKey: eventName);
             }
@@ -253,9 +272,9 @@ namespace Juice.EventBus.RabbitMQ
             {
                 throw new ArgumentNullException("@event");
             }
-            if (!_persistentConnection.IsConnected)
+            if (!_persistentConnection.IsConnected && !_persistentConnection.TryConnect())
             {
-                _persistentConnection.TryConnect();
+                throw new InvalidOperationException("RabbitMQ broker is not connected");
             }
 
             var policy = RetryPolicy.Handle<BrokerUnreachableException>()

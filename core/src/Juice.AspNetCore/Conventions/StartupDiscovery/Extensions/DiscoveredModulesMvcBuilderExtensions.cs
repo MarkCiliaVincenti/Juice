@@ -64,7 +64,7 @@ namespace Juice.Conventions.StartupDiscovery.Extensions
             var enabled = appOptions.Features ?? Array.Empty<string>();
             var disabled = appOptions.ExcludedFeatures ?? Array.Empty<string>();
 
-            var requirements = GetRequirementFeatures(types, new HashSet<string>(), enabled, disabled, logger);
+            var requirements = GetDependentFeatures(types, new HashSet<string>(), enabled, disabled, logger);
 
             var hasConflict = false;
 
@@ -101,7 +101,7 @@ namespace Juice.Conventions.StartupDiscovery.Extensions
             }
         }
 
-        private static IEnumerable<string> GetRequirementFeatures(IEnumerable<Type> types, HashSet<string> requirements, string[] enabled, string[] disabled, ILogger? logger)
+        private static IEnumerable<string> GetDependentFeatures(IEnumerable<Type> types, HashSet<string> requirements, string[] enabled, string[] disabled, ILogger? logger)
         {
             var hasNewRequirement = false;
             foreach (var type in types)
@@ -137,7 +137,7 @@ namespace Juice.Conventions.StartupDiscovery.Extensions
             }
             if (hasNewRequirement)
             {
-                return GetRequirementFeatures(types, requirements, enabled, disabled, logger);
+                return GetDependentFeatures(types, requirements, enabled, disabled, logger);
             }
             return requirements;
         }

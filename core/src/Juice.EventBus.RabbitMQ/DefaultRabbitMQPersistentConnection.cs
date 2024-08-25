@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
@@ -16,8 +17,9 @@ namespace Juice.EventBus.RabbitMQ
         private IConnectionFactory _connectionFactory;
         private ILogger<DefaultRabbitMQPersistentConnection> _logger;
         private readonly int _retryCount;
-        private IConnection _connection;
+        private IConnection? _connection;
         private bool _disposed;
+        private bool _disposing;
 
         private object sync_root = new object();
 
@@ -60,14 +62,14 @@ namespace Juice.EventBus.RabbitMQ
             }
         }
 
-        public IModel CreateModel()
+        public IModel? CreateModel()
         {
             if (!IsConnected)
             {
                 throw new InvalidOperationException("No RabbitMQ connections are available to perform this action");
             }
 
-            return _connection.CreateModel();
+            return _connection?.CreateModel();
         }
         #region Disposable
 
@@ -85,7 +87,9 @@ namespace Juice.EventBus.RabbitMQ
             {
                 if (disposing)
                 {
+                    _disposing = true;
                     // dispose managed state (managed objects)
+                    _connection?.Close();
                     _connection?.Dispose();
                     _connection = null!;
                     _logger = null!;
@@ -102,6 +106,11 @@ namespace Juice.EventBus.RabbitMQ
 
         public bool TryConnect()
         {
+            if (_disposed || _disposing) {
+                _logger.LogInformation("Connect bypassed because RabbitMQ Client is disposed");
+                return false;
+            }
+            
             _logger.LogInformation("RabbitMQ Client is trying to connect");
 
             lock (sync_root)
@@ -159,7 +168,7 @@ namespace Juice.EventBus.RabbitMQ
 
         private void OnConnectionShutdown(object sender, ShutdownEventArgs reason)
         {
-            if (_disposed) { return; }
+            if (_disposed || _disposing) { return; }
 
             _logger.LogWarning("A RabbitMQ connection is on shutdown. Trying to re-connect...");
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -34,6 +35,13 @@ namespace Juice.Modular
         /// <param name="routes"></param>
         /// <param name="env"></param>
         void Configure(IApplicationBuilder app, IEndpointRouteBuilder routes, IWebHostEnvironment env);
+
+        /// <summary>
+        /// Called when the application is shutting down
+        /// </summary>
+        /// <param name="env"></param>
+        /// <param name="serviceProvider"></param>
+        void OnShutdown(IServiceProvider serviceProvider, IWebHostEnvironment env);
     }
 
 }

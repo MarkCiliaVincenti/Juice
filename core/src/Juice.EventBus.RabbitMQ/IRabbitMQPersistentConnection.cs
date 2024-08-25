@@ -9,6 +9,6 @@ namespace Juice.EventBus.RabbitMQ
 
         bool TryConnect();
 
-        IModel CreateModel();
+        IModel? CreateModel();
     }
 }
