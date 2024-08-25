@@ -60,21 +60,27 @@ namespace Juice.EventBus.Tests
 
             var serviceProvider = resolver.ServiceProvider;
             var eventBus = serviceProvider.GetService<IEventBus>();
+            var handledService = serviceProvider.GetRequiredService<HandledService>();
             if (eventBus != null)
             {
                 eventBus.Subscribe<ContentPublishedIntegrationEvent, ContentPublishedIntegrationEventHandler>();
                 eventBus.Subscribe<ContentPublishedIntegrationEvent, ContentPublishedIntegrationEventHandler1>();
+
+                await Task.Delay(TimeSpan.FromSeconds(3)); // wait for pending messages to be processed
+                handledService.Handlers.Clear();
 
                 for (var i = 0; i < 10; i++)
                 {
                     await eventBus.PublishAsync(new ContentPublishedIntegrationEvent($"Hello {i}"));
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(3));
+                await Task.Delay(TimeSpan.FromSeconds(5));
 
                 eventBus.Unsubscribe<ContentPublishedIntegrationEvent, ContentPublishedIntegrationEventHandler>();
                 eventBus.Unsubscribe<ContentPublishedIntegrationEvent, ContentPublishedIntegrationEventHandler1>();
-                await Task.Delay(TimeSpan.FromSeconds(3));
+                await Task.Delay(TimeSpan.FromSeconds(1));
+
+                handledService.Handlers.Should().HaveCount(20);
             }
         }
 

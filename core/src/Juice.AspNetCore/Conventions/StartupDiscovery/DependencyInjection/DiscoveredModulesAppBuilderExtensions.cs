@@ -52,6 +52,23 @@ namespace Juice.Modular
             {
                 throw new Exception("Some module failed. Please enable logging for Startup at Trace level for more information.");
             }
+
+            app.Lifetime.ApplicationStopping.Register(() =>
+            {
+                foreach (var startup in startups)
+                {
+                    try
+                    {
+                        startup.OnShutdown(app.Services, env);
+                    }
+                    catch (Exception ex)
+                    {
+                        logger?.LogError("Failed to shutdown {service}. Message: {message}", startup.GetType().FullName, ex.Message);
+                        logger?.LogTrace(ex.StackTrace);
+                    }
+                }
+                logger?.LogInformation("All modules shutdown completed.");
+            });
         }
     }
 }
