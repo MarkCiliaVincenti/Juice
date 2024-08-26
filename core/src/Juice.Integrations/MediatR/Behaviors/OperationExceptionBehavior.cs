@@ -23,9 +23,9 @@ namespace Juice.Integrations.MediatR.Behaviors
                 if (result != null && !result.Succeeded)
                 {
                     _logger.LogError("Command {typeName} {request} not success. {message}", typeName, request?.ToString() ?? "", result.Message);
-                    if (_logger.IsEnabled(LogLevel.Debug) && result is OperationResult rs1 && rs1.Exception != null)
+                    if (_logger.IsEnabled(LogLevel.Debug) && result.Exception != null)
                     {
-                        _logger.LogDebug(rs1.Exception.StackTrace);
+                        _logger.LogDebug(result.Exception.StackTrace);
                     }
                 }
                 else if (result == null)
