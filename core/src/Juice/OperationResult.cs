@@ -15,6 +15,25 @@ namespace Juice
         public T? Data { get; set; }
     }
 
+    public static class OperationResultExtensions
+    {
+        /// <summary>
+        /// Convert an <see cref="IOperationResult"/> to an <see cref="IOperationResult{T}"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="operationResult"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static IOperationResult<T> Of<T>(this IOperationResult operationResult, T? data = default)
+            => new OperationResultInternal<T>
+                {
+                    Exception = operationResult.Exception,
+                    Message = operationResult.Message,
+                    Succeeded = operationResult.Succeeded,
+                    Data = data
+                };
+    }
+
     public class OperationResult
     {
         private static readonly OperationResultInternal _success = new OperationResultInternal { Succeeded = true };
@@ -76,6 +95,7 @@ namespace Juice
                 Message = message
             };
 
+        public static IOperationResult? FromJson(string json) => JsonConvert.DeserializeObject<OperationResultInternal>(json);
         #endregion
 
         #region OperationResult<T>
@@ -106,10 +126,11 @@ namespace Juice
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="message"></param>
+        /// <param name="data"></param>
         /// <returns></returns>
-        public static IOperationResult<T> Failed<T>(string? message)
+        public static IOperationResult<T> Failed<T>(string? message, T? data = default)
             => new OperationResultInternal<T>()
-            { Succeeded = false, Message = message };
+            { Succeeded = false, Message = message, Data = data };
 
         /// <summary>
         /// Create a succeeded <see cref="IOperationResult{T}"/> with data and a message
@@ -162,7 +183,7 @@ namespace Juice
                 System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
             }
         }
-        
+
         public override string? ToString()
             => Message ?? (Succeeded ? "Operation Succeeded" : "Operation Failed");
 
