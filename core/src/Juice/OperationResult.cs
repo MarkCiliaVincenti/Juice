@@ -18,9 +18,26 @@ namespace Juice
     public class OperationResult
     {
         private static readonly OperationResultInternal _success = new OperationResultInternal { Succeeded = true };
+
+        /// <summary>
+        /// Return a succeeded <see cref="IOperationResult"/>
+        /// </summary>
         public static IOperationResult Success => _success;
 
         #region OperationResult
+
+        /// <summary>
+        /// Create a succeeded <see cref="IOperationResult"/> with a message
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static IOperationResult Succeeded(string? message)
+            => new OperationResultInternal()
+            {
+                Succeeded = true,
+                Message = message
+            };
+
         /// <summary>
         /// Create a failed <see cref="IOperationResult"/> with an <see cref="System.Exception"/>
         /// </summary>
@@ -110,7 +127,7 @@ namespace Juice
         /// <param name="message"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static IOperationResult<T> Empty<T>(string? message = null)
+        public static IOperationResult<T> Succeeded<T>(string? message = null)
             => new OperationResultInternal<T>()
             { Succeeded = true, Message = message };
 
