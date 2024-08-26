@@ -78,10 +78,11 @@ namespace Juice
         /// <typeparam name="T"></typeparam>
         /// <param name="ex"></param>
         /// <param name="message"></param>
+        /// <param name="data"></param>
         /// <returns></returns>
-        public static IOperationResult<T> Failed<T>(Exception ex, string? message)
+        public static IOperationResult<T> Failed<T>(Exception ex, string? message, T? data = default)
             => new OperationResultInternal<T>()
-            { Succeeded = false, Exception = ex, Message = message };
+            { Succeeded = false, Exception = ex, Message = message, Data = data };
 
         /// <summary>
         /// Create a failed <see cref="IOperationResult{T}"/> with message
