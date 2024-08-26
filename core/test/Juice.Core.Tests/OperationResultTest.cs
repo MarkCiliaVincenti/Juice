@@ -20,6 +20,11 @@ namespace Juice.Core.Tests
             var rs = OR.Success;
             rs.Succeeded.Should().BeTrue();
             _output.WriteLine(rs.ToString());
+
+            var rs1 = OR.Succeeded("message");
+            rs1.Succeeded.Should().BeTrue();
+            rs1.Message.Should().Be("message");
+            _output.WriteLine(rs1.ToString());
         }
 
         [Fact]
@@ -34,14 +39,27 @@ namespace Juice.Core.Tests
         [Fact]
         public void OR_should_be_success_without_data()
         {
-            var rs = OR.Empty<string>();
+            var rs = OR.Succeeded<string>("message");
             rs.Succeeded.Should().BeTrue();
             rs.Data.Should().BeNull();
+            rs.Message.Should().Be("message");
             _output.WriteLine(rs.ToString());
         }
 
         [Fact]
-        public void OR_should_be_failed()
+        public void OR_should_be_failed_with_data()
+        {
+            var rs = OR.Failed<string>(new Exception("Inner message"), "message", "string data");
+
+            rs.Succeeded.Should().BeFalse();
+            rs.Data.Should().Be("string data");
+            rs.Message.Should().Be("message");
+            rs.Exception.Should().NotBeNull();
+            _output.WriteLine(rs.ToString());
+        }
+
+        [Fact]
+        public void OR_should_be_throwed_with_full_stack_trace()
         {
             try {
                 var rs = Action();
