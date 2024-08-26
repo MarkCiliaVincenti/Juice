@@ -70,7 +70,17 @@ namespace Juice.Core.Tests
                 _output.WriteLine(ex.StackTrace);
                 ex.StackTrace.Should().Contain("OperationResultTest.Action()");
             }
-           
+        }
+
+        [Fact]
+        public void OR_should_be_changed_type()
+        {
+            var rs = OR.Failed(new Exception("Inner message")).Of<int>();
+            rs.Succeeded.Should().BeFalse();
+            rs.Exception.Should().NotBeNull();
+            rs.Message.Should().Be("Inner message");
+            rs.Data.Should().Be(0);
+            _output.WriteLine(rs.ToString());
         }
 
         private IOperationResult Action() {
@@ -90,4 +100,5 @@ namespace Juice.Core.Tests
     {
        
     }
+
 }
