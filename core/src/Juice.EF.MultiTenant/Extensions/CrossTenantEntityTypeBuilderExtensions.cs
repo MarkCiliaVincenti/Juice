@@ -99,19 +99,19 @@ namespace Juice.MultiTenant.EF.Extensions
             Type clrType = builder.Metadata.ClrType;
             if (clrType != null)
             {
-                if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityUser<>)))
+                if (clrType.GetGenericTypeDefinition() ==(typeof(IdentityUser<>)))
                 {
                     UpdateIdentityUserIndex(builder);
                 }
 
-                if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityRole<>)))
+                if (clrType.GetGenericTypeDefinition() == (typeof(IdentityRole<>)))
                 {
                     UpdateIdentityRoleIndex(builder);
                 }
 
                 // This is a special case that should still occur.
                 // Note the index below is not unique;
-                if (clrType.ImplementsOrInheritsUnboundGeneric(typeof(IdentityUserLogin<>)))
+                if (clrType.GetGenericTypeDefinition() == (typeof(IdentityUserLogin<>)))
                 {
                     UpdateIdentityUserLoginPrimaryKey(builder);
                     AddIdentityUserLoginIndex(builder);
