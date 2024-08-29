@@ -8,6 +8,7 @@ namespace Juice.EF
         where TContext : DbContext, IUnitOfWork
     {
         public IUnitOfWork UnitOfWork { get; private set; }
+        protected TContext Context => (TContext)UnitOfWork;
         public RepositoryBase(TContext context) => UnitOfWork = context;
     }
 }

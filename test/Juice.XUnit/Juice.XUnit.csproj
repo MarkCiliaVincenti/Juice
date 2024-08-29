@@ -11,7 +11,7 @@
 
 
     <ItemGroup>
-        <PackageReference Include="xunit.core" Version="2.4.1" />
+        <PackageReference Include="xunit.core" Version="2.9.0" />
         <PackageReference Include="Newtonsoft.Json" Version="*" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftExtensionsVersion)" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftExtensionsVersion)" />

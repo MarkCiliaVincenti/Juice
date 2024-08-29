@@ -1,21 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>$(AppTargetFramework)</TargetFrameworks>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Description>Extend EF DBContext to full data audit event.</Description>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFrameworks>$(AppTargetFramework)</TargetFrameworks>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Description>Extend EF DBContext to full data audit event.</Description>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="$(EFVersion)" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EFVersion)" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="$(EFVersion)" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EFVersion)" />
+        <PackageReference Label="severity vulnerability fix" Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Juice.MediatR\Juice.MediatR.csproj" />
-    <ProjectReference Include="..\Juice\Juice.csproj" />
-  </ItemGroup>
-  
+    <ItemGroup>
+        <ProjectReference Include="..\Juice.MediatR\Juice.MediatR.csproj" />
+        <ProjectReference Include="..\Juice\Juice.csproj" />
+    </ItemGroup>
+
 </Project>
