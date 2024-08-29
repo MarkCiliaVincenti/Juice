@@ -12,9 +12,9 @@ namespace Juice.Domain
     {
         IUnitOfWork UnitOfWork { get; }
 
-        Task<IOperationResult<T>> AddAsync(T entity, CancellationToken token);
-        Task<IOperationResult> DeleteAsync(T entity, CancellationToken token);
-        Task<IOperationResult> UpdateAsync(T entity, CancellationToken token);
-        Task<T?> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken token);
+        Task<IOperationResult<T>> AddAsync(T entity, CancellationToken token = default);
+        Task<IOperationResult> DeleteAsync(T entity, CancellationToken token = default);
+        Task<IOperationResult> UpdateAsync(T entity, CancellationToken token = default);
+        Task<T?> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken token = default);
     }
 }
