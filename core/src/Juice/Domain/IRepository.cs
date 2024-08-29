@@ -11,25 +11,10 @@ namespace Juice.Domain
         where T : class
     {
         IUnitOfWork UnitOfWork { get; }
-    }
 
-    public static class RepositoryExtensions
-    {
-        public static async Task<IOperationResult<T>> AddAsync<T>(this IRepository<T> repository, T entity,
-            CancellationToken token)
-            where T : class
-            => await repository.UnitOfWork.AddAndSaveAsync(entity, token);
-        public static async Task<IOperationResult> DeleteAsync<T>(this IRepository<T> repository, T entity,
-            CancellationToken token)
-            where T : class
-            => await repository.UnitOfWork.DeleteAsync(entity, token);
-        public static async Task<T?> FindAsync<T>(this IRepository<T> repository,
-            Expression<Func<T, bool>> predicate, CancellationToken token)
-            where T : class
-            => await repository.UnitOfWork.FindAsync(predicate, token);
-        public static async Task<IOperationResult> UpdateAsync<T>(this IRepository<T> repository,
-            T entity, CancellationToken token)
-            where T : class
-            => await repository.UnitOfWork.UpdateAsync(entity, token);
+        Task<IOperationResult<T>> AddAsync(T entity, CancellationToken token);
+        Task<IOperationResult> DeleteAsync(T entity, CancellationToken token);
+        Task<IOperationResult> UpdateAsync(T entity, CancellationToken token);
+        Task<T?> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken token);
     }
 }
