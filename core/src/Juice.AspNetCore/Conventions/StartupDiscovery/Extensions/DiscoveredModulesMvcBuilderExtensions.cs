@@ -23,14 +23,15 @@ namespace Juice.Conventions.StartupDiscovery.Extensions
             builder.PartManager.PopulateFeature(feature);
             builder.Services.AddSingleton(feature);
 
-            var loggerFactory = builder.Services.BuildServiceProvider()
-                .GetService<ILoggerFactory>();
+            var serviceProvider = builder.Services.BuildServiceProvider();
+            var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+            var nameProvider = serviceProvider.GetService<IFeatureNameProvider>();
 
             var logger = loggerFactory?.CreateLogger("Startup");
 
-            EnableFeatures(builder, feature.Startups, configuration, logger);
+            EnableFeatures(builder, feature.Startups, configuration, logger, nameProvider);
 
-            var startups = builder.Services.BuildServiceProvider().GetServices<IModuleStartup>()
+            var startups = serviceProvider.GetServices<IModuleStartup>()
                 .OrderBy(s => s.StartOrder)
                 .ToArray();
             var hasError = false;
@@ -56,7 +57,9 @@ namespace Juice.Conventions.StartupDiscovery.Extensions
             return builder;
         }
 
-        private static void EnableFeatures(IMvcBuilder builder, IEnumerable<Type> types, IConfiguration configuration, ILogger? logger)
+        private static void EnableFeatures(IMvcBuilder builder, IEnumerable<Type> types,
+            IConfiguration configuration,
+            ILogger? logger, IFeatureNameProvider? nameProvider)
         {
             var appOptions = new FeatureOptions();
             configuration.GetSection("App").Bind(appOptions);
@@ -64,13 +67,13 @@ namespace Juice.Conventions.StartupDiscovery.Extensions
             var enabled = appOptions.Features ?? Array.Empty<string>();
             var disabled = appOptions.ExcludedFeatures ?? Array.Empty<string>();
 
-            var requirements = GetDependentFeatures(types, new HashSet<string>(), enabled, disabled, logger);
+            var requirements = GetDependentFeatures(types, new HashSet<string>(), enabled, disabled, logger, nameProvider);
 
             var hasConflict = false;
 
             foreach (var startup in types)
             {
-                var featureName = startup.GetFeatureName();
+                var featureName = nameProvider?.GetFeatureName(startup) ?? startup.GetFeatureName();
 
                 if (requirements.Any(f => f.Equals(featureName, StringComparison.OrdinalIgnoreCase)))
                 {
@@ -101,12 +104,14 @@ namespace Juice.Conventions.StartupDiscovery.Extensions
             }
         }
 
-        private static IEnumerable<string> GetDependentFeatures(IEnumerable<Type> types, HashSet<string> requirements, string[] enabled, string[] disabled, ILogger? logger)
+        private static IEnumerable<string> GetDependentFeatures(IEnumerable<Type> types,
+            HashSet<string> requirements, string[] enabled, string[] disabled,
+            ILogger? logger, IFeatureNameProvider? nameProvider)
         {
             var hasNewRequirement = false;
             foreach (var type in types)
             {
-                var featureName = type.GetFeatureName();
+                var featureName = nameProvider?.GetFeatureName(type) ?? type.GetFeatureName();
                 var feature = type.GetFeature();
 
                 if (
@@ -137,7 +142,7 @@ namespace Juice.Conventions.StartupDiscovery.Extensions
             }
             if (hasNewRequirement)
             {
-                return GetDependentFeatures(types, requirements, enabled, disabled, logger);
+                return GetDependentFeatures(types, requirements, enabled, disabled, logger, nameProvider);
             }
             return requirements;
         }
