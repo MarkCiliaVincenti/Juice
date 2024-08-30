@@ -24,7 +24,7 @@ namespace Juice.Modular
         /// <param name="app"></param>
         /// <param name="env"></param>
         /// <exception cref="Exception"></exception>
-        public static void ConfigureDiscoverdModules(this WebApplication app, IWebHostEnvironment env)
+        public static void ConfigureDiscoveredModules(this WebApplication app, IWebHostEnvironment env)
         {
             var startups = app.Services.GetServices<IModuleStartup>()
                 .OrderBy(s => s.ConfigureOrder)

@@ -11,7 +11,7 @@ var app = builder.Build();
 
 app.UseRouting();
 
-app.ConfigureDiscoverdModules(app.Environment);
+app.ConfigureDiscoveredModules(app.Environment);
 
 app.MapGet("/protect", async (context) =>
 {
