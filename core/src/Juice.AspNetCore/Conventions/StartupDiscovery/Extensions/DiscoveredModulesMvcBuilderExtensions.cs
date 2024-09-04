@@ -31,7 +31,7 @@ namespace Juice.Conventions.StartupDiscovery.Extensions
 
             EnableFeatures(builder, feature.Startups, configuration, logger, nameProvider);
 
-            var startups = serviceProvider.GetServices<IModuleStartup>()
+            var startups = builder.Services.BuildServiceProvider().GetServices<IModuleStartup>()
                 .OrderBy(s => s.StartOrder)
                 .ToArray();
             var hasError = false;
