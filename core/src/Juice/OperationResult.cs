@@ -13,6 +13,8 @@ namespace Juice
     public interface IOperationResult<T> : IOperationResult
     {
         public T? Data { get; set; }
+        public bool HasData => Data != null;
+        public bool SucceededWithData => Succeeded && HasData;
     }
 
     public static class OperationResultExtensions

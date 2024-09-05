@@ -33,6 +33,8 @@ namespace Juice.Core.Tests
             var rs = OR.Result("data");
             rs.Succeeded.Should().BeTrue();
             rs.Data.Should().Be("data");
+            rs.HasData.Should().BeTrue();
+            rs.SucceededWithData.Should().BeTrue();
             _output.WriteLine(rs.ToString());
         }
 
@@ -43,6 +45,8 @@ namespace Juice.Core.Tests
             rs.Succeeded.Should().BeTrue();
             rs.Data.Should().BeNull();
             rs.Message.Should().Be("message");
+            rs.HasData.Should().BeFalse();
+            rs.SucceededWithData.Should().BeFalse();
             _output.WriteLine(rs.ToString());
         }
 
