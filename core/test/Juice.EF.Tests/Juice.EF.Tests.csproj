@@ -40,7 +40,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\test\Juice.Multitenant.SharedTest\Juice.MultiTenant.SharedTest.csproj" />
+        <ProjectReference Include="..\..\..\test\Juice.MultiTenant.SharedTest\Juice.MultiTenant.SharedTest.csproj" />
         <ProjectReference Include="..\..\..\test\Juice.XUnit\Juice.XUnit.csproj" />
         <ProjectReference Include="..\..\src\Juice.AspNetCore\Juice.AspNetCore.csproj" />
         <ProjectReference Include="..\..\src\Juice.EF.MultiTenant\Juice.EF.MultiTenant.csproj" />
