@@ -97,7 +97,7 @@ namespace Juice.MultiTenant.EF.Extensions
 
             // TODO: Legacy code for Identity types. Should be covered by adjustUniqueIndexes etc in the future.
             Type clrType = builder.Metadata.ClrType;
-            if (clrType != null)
+            if (clrType != null && clrType.IsGenericType)
             {
                 if (clrType.GetGenericTypeDefinition() ==(typeof(IdentityUser<>)))
                 {

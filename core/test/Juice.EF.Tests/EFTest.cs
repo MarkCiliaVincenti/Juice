@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Juice.AspNetCore.Models;
 using Juice.Domain.Events;
 using Juice.EF.Tests.Domain;
 using Juice.EF.Tests.EventHandlers;
 using Juice.EF.Tests.Infrastructure;
 using Juice.EF.Tests.Migrations;
-using Juice.Extensions;
 using Juice.Extensions.DependencyInjection;
 using Juice.Services;
 using Juice.XUnit;

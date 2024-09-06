@@ -10,20 +10,18 @@
     <PackageIconUrl>https://avatars.githubusercontent.com/u/107674950</PackageIconUrl>
     <RepositoryUrl>https://github.com/creatorflow-io/Juice</RepositoryUrl>
     
-    <VersionPrefix>7.0.3</VersionPrefix>
+    <VersionPrefix>7.0.4</VersionPrefix>
     <VersionSuffix>local.$([System.DateTime]::Now.ToString(`yyyyMMdd`)).1</VersionSuffix>
   </PropertyGroup>
 
   <PropertyGroup Label="Versioning">
     <LibraryTargetFramework>netstandard2.1</LibraryTargetFramework>
     <AppTargetFramework>net6.0;net8.0</AppTargetFramework>
-    <AspNetCoreVersion>2.2.0</AspNetCoreVersion>
     <MicrosoftExtensionsVersion>8.0.*</MicrosoftExtensionsVersion>
     <GrpcVersion>2.57.0</GrpcVersion>
     <ProtobufVersion>3.24.3</ProtobufVersion>
     <MediatRVersion>12.4.*</MediatRVersion>
     <RedisVersion>2.8.*</RedisVersion>
-    <JuiceRefVersion Condition="$(JuiceRefVersion)==''">7.0.3</JuiceRefVersion>
     <FinbuckleVersion>7.0.*</FinbuckleVersion>
     <SwashbuckleVersion>6.7.*</SwashbuckleVersion>
   </PropertyGroup>
