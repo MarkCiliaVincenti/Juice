@@ -1,7 +1,7 @@
 ﻿using Finbuckle.MultiTenant.AspNetCore.Internal;
 using Microsoft.AspNetCore.Http;
 
-namespace Juice.Multitenant.SharedTest
+namespace Juice.MultiTenant.SharedTest
 {
     public static class TenantTestHelper
     {

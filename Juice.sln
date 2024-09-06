@@ -75,7 +75,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Juice.Tests.Host", "test\Ju
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Juice.EF.MultiTenant", "core\src\Juice.EF.MultiTenant\Juice.EF.MultiTenant.csproj", "{D06FF6F9-38EC-447F-9CEF-025D7F8F6CCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Juice.Multitenant.SharedTest", "test\Juice.Multitenant.SharedTest\Juice.Multitenant.SharedTest.csproj", "{E3010F25-3686-49C1-81F1-86ECAA482965}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Juice.MultiTenant.SharedTest", "test\Juice.Multitenant.SharedTest\Juice.MultiTenant.SharedTest.csproj", "{E3010F25-3686-49C1-81F1-86ECAA482965}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
