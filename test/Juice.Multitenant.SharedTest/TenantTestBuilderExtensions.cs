@@ -1,9 +1,8 @@
 ﻿using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Abstractions;
-using Juice.MultiTenant;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Juice.Multitenant.SharedTest
+namespace Juice.MultiTenant.SharedTest
 {
     public static class TenantTestBuilderExtensions
     {
@@ -16,7 +15,7 @@ namespace Juice.Multitenant.SharedTest
         /// <param name="identifierA"></param>
         /// <param name="identifierB"></param>
         /// <returns></returns>
-        public static MultiTenantBuilder<TTenant> AddRandomTenantTest<TTenant>(this IServiceCollection services, string identifierA = "tenant-A", string identifierB = "tenant-B")
+        public static MultiTenantBuilder<TTenant> AddRandomTenantsTest<TTenant>(this IServiceCollection services, string identifierA = "tenant-A", string identifierB = "tenant-B")
             where TTenant : class, ITenantInfo, ITenant, new()
         {
             return services
@@ -46,7 +45,7 @@ namespace Juice.Multitenant.SharedTest
         /// <param name="services"></param>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        public static MultiTenantBuilder<TTenant> AddTenantTest<TTenant>(this IServiceCollection services, string identifier = "tenant-A")
+        public static MultiTenantBuilder<TTenant> AddStaticTenantTest<TTenant>(this IServiceCollection services, string identifier = "tenant-A")
             where TTenant : class, ITenantInfo, ITenant, new()
         {
             return services

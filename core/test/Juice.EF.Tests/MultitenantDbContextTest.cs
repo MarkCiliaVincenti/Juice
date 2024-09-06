@@ -5,7 +5,7 @@ using FluentAssertions;
 using Juice.Domain;
 using Juice.EF.Tests.Infrastructure;
 using Juice.Extensions.DependencyInjection;
-using Juice.Multitenant.SharedTest;
+using Juice.MultiTenant.SharedTest;
 using Juice.MultiTenant;
 using Juice.XUnit;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +48,7 @@ namespace Juice.EF.Tests
                         options.MigrationsHistoryTable("__EFTestMigrationsHistory", "Contents");
                     });
                 });
-                services.AddTenantTest<TenantInfo>();
+                services.AddStaticTenantTest<TenantInfo>();
 
                 services.AddMediatR(options =>
                 {

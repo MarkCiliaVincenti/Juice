@@ -3,7 +3,7 @@ using Juice.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 
-namespace Juice.Multitenant.SharedTest
+namespace Juice.MultiTenant.SharedTest
 {
     internal class MyHttpContext : HttpContext
     {
