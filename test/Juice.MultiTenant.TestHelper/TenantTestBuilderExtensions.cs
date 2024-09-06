@@ -18,7 +18,9 @@ namespace Microsoft.Extensions.DependencyInjection
         public static MultiTenantBuilder<TTenant> AddTestTenantRandom<TTenant>(this IServiceCollection services, string identifierA = "tenant-A", string identifierB = "tenant-B")
             where TTenant : class, ITenantInfo, ITenant, new()
         {
-
+#pragma warning disable CS8603 // Possible null reference return.
+            services.AddScoped<ITenant>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<TTenant>>().MultiTenantContext.TenantInfo);
+#pragma warning restore CS8603 // Possible null reference return.
             return services
                 .AddMultiTenant<TTenant>()
                 .WithInMemoryStore(options =>
@@ -49,6 +51,9 @@ namespace Microsoft.Extensions.DependencyInjection
         public static MultiTenantBuilder<TTenant> AddTestTenantStatic<TTenant>(this IServiceCollection services, string identifier = "tenant-A")
             where TTenant : class, ITenantInfo, ITenant, new()
         {
+#pragma warning disable CS8603 // Possible null reference return.
+            services.AddScoped<ITenant>(sp => sp.GetRequiredService<IMultiTenantContextAccessor<TTenant>>().MultiTenantContext.TenantInfo);
+#pragma warning restore CS8603 // Possible null reference return.
             return services
                 .AddMultiTenant<TTenant>()
                 .WithInMemoryStore(options =>
@@ -61,10 +66,5 @@ namespace Microsoft.Extensions.DependencyInjection
                 .WithStaticStrategy(identifier);
         }
 
-        public static IServiceCollection AddTenantTestHelper(this IServiceCollection services)
-        {
-            services.AddHttpContextAccessor();
-            return services;
-        }
     }
 }

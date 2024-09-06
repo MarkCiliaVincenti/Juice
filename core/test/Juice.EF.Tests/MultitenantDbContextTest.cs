@@ -71,6 +71,8 @@ namespace Juice.EF.Tests
                 var tenantContextAccessor = serviceProvider.GetRequiredService<IMultiTenantContextAccessor>();
                 tenantContextAccessor.MultiTenantContext.Should().NotBeNull();
                 tenantContextAccessor.MultiTenantContext.TenantInfo.Should().NotBeNull();
+                var tenant = serviceProvider.GetService<ITenant>();
+                tenant.Should().NotBeNull();
                 var dbContext = serviceProvider.GetRequiredService<TestContext>();
                 dbContext.TenantInfo.Should().NotBeNull();
                 _output.WriteLine("dbContext.TenantInfo: {0}", dbContext.TenantInfo!.Identifier);
