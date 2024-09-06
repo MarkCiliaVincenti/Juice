@@ -1,5 +1,6 @@
 ﻿using System;
 using Juice.EF.Extensions;
+using Juice.MultiTenant.EF.Extensions;
 using Juice.EF.Tests.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,6 +37,13 @@ namespace Juice.EF.Tests.Infrastructure
                     .HasFilter($"[{nameof(Content.CreatedUser)}] is not null")
                     .IncludeProperties(m => new { m.Name, m.Code, m.CreatedDate });
                 #endregion
+            });
+
+            modelBuilder.Entity<CrossTenantContent>(entity =>
+            {
+                entity.ToTable(nameof(CrossTenantContent), SCHEMA);
+
+                entity.IsCrossTenant();
             });
         }
     }
