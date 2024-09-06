@@ -32,7 +32,7 @@ namespace Juice.MultiTenant.EF
         {
             base.ConfigureServices(serviceProvider);
 
-            TenantInfo = serviceProvider.GetService<ITenantInfo>();
+            TenantInfo = serviceProvider.GetService<IMultiTenantContextAccessor>()?.MultiTenantContext.TenantInfo;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

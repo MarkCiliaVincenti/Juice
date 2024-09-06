@@ -189,7 +189,5 @@ namespace Juice.EF.Tests
             await mediator.Publish(dataEvent).ConfigureAwait(false);
             await Task.Delay(1000);
         }
-
     }
-
 }
