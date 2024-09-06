@@ -1,8 +1,8 @@
 ﻿using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Abstractions;
-using Microsoft.Extensions.DependencyInjection;
+using Juice.MultiTenant;
 
-namespace Juice.MultiTenant.SharedTest
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class TenantTestBuilderExtensions
     {
@@ -15,9 +15,10 @@ namespace Juice.MultiTenant.SharedTest
         /// <param name="identifierA"></param>
         /// <param name="identifierB"></param>
         /// <returns></returns>
-        public static MultiTenantBuilder<TTenant> AddRandomTenantsTest<TTenant>(this IServiceCollection services, string identifierA = "tenant-A", string identifierB = "tenant-B")
+        public static MultiTenantBuilder<TTenant> AddTestTenantRandom<TTenant>(this IServiceCollection services, string identifierA = "tenant-A", string identifierB = "tenant-B")
             where TTenant : class, ITenantInfo, ITenant, new()
         {
+
             return services
                 .AddMultiTenant<TTenant>()
                 .WithInMemoryStore(options =>
@@ -45,7 +46,7 @@ namespace Juice.MultiTenant.SharedTest
         /// <param name="services"></param>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        public static MultiTenantBuilder<TTenant> AddStaticTenantTest<TTenant>(this IServiceCollection services, string identifier = "tenant-A")
+        public static MultiTenantBuilder<TTenant> AddTestTenantStatic<TTenant>(this IServiceCollection services, string identifier = "tenant-A")
             where TTenant : class, ITenantInfo, ITenant, new()
         {
             return services
@@ -58,6 +59,12 @@ namespace Juice.MultiTenant.SharedTest
                     options.Tenants.Add(tenant);
                 })
                 .WithStaticStrategy(identifier);
+        }
+
+        public static IServiceCollection AddTenantTestHelper(this IServiceCollection services)
+        {
+            services.AddHttpContextAccessor();
+            return services;
         }
     }
 }

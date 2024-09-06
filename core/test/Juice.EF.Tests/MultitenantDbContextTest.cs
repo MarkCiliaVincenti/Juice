@@ -5,7 +5,6 @@ using FluentAssertions;
 using Juice.Domain;
 using Juice.EF.Tests.Infrastructure;
 using Juice.Extensions.DependencyInjection;
-using Juice.MultiTenant.SharedTest;
 using Juice.MultiTenant;
 using Juice.XUnit;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +47,7 @@ namespace Juice.EF.Tests
                         options.MigrationsHistoryTable("__EFTestMigrationsHistory", "Contents");
                     });
                 });
-                services.AddStaticTenantTest<TenantInfo>();
+                services.AddTestTenantStatic<TenantInfo>();
 
                 services.AddMediatR(options =>
                 {
@@ -67,7 +66,7 @@ namespace Juice.EF.Tests
             });
 
             var serviceProvider = resolver.ServiceProvider.CreateScope().ServiceProvider;
-            await TenantTestHelper.InnerTenantAsync(serviceProvider, context =>
+            await serviceProvider.TenantInvokeAsync(context =>
             {
                 var tenantContextAccessor = serviceProvider.GetRequiredService<IMultiTenantContextAccessor>();
                 tenantContextAccessor.MultiTenantContext.Should().NotBeNull();
