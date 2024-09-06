@@ -3,11 +3,12 @@ using Juice.EF.Extensions;
 using Juice.MultiTenant.EF.Extensions;
 using Juice.EF.Tests.Domain;
 using Microsoft.EntityFrameworkCore;
+using Juice.MultiTenant.EF;
 
 namespace Juice.EF.Tests.Infrastructure
 {
 
-    public class TestContext : DbContextBase
+    public class TestContext : MultiTenantDbContext
     {
         public const string SCHEMA = "Contents";
         public DbSet<Content> Contents { get; set; }
