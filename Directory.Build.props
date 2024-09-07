@@ -24,6 +24,8 @@
     <RedisVersion>2.8.*</RedisVersion>
     <FinbuckleVersion>7.0.*</FinbuckleVersion>
     <SwashbuckleVersion>6.7.*</SwashbuckleVersion>
+    <XUnitVersion>2.9.*</XUnitVersion>
+    <TestSdk>17.11.*</TestSdk>
   </PropertyGroup>
 
 
