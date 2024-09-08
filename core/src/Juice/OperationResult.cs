@@ -34,6 +34,21 @@ namespace Juice
                     Succeeded = operationResult.Succeeded,
                     Data = data
                 };
+        /// <summary>
+        /// Convert an <see cref="IOperationResult"/> to an <see cref="IOperationResult{T}"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="operationResult"></param>
+        /// <param name="prependMessage"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static IOperationResult<T> Of<T>(this IOperationResult operationResult, string prependMessage, T? data = default)
+            => new OperationResultInternal<T>
+            {
+                Exception = operationResult.Exception,
+                Message = prependMessage + (operationResult.Message ?? ""),
+                Succeeded = operationResult.Succeeded,
+            };
     }
 
     public class OperationResult
