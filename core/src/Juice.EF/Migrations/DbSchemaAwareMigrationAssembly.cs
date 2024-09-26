@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations.Internal;
 
 namespace Juice.EF.Migrations
 {
+#pragma warning disable EF1001 // Internal EF Core API usage.
     public class DbSchemaAwareMigrationAssembly : MigrationsAssembly
     {
         private readonly DbContext _context;
@@ -38,4 +39,6 @@ namespace Juice.EF.Migrations
             return base.CreateMigration(migrationClass, activeProvider);
         }
     }
+#pragma warning restore EF1001 // Internal EF Core API usage.
+
 }

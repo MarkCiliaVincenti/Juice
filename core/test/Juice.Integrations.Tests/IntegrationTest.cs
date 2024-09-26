@@ -28,8 +28,7 @@ namespace Juice.Integrations.Tests
     [TestCaseOrderer("Juice.XUnit.PriorityOrderer", "Juice.XUnit")]
     public class IntegrationTest
     {
-        private readonly string TestSchema1 = "Contents";
-        private readonly string TestSchema2 = "Cms";
+        private readonly string _testSchema1 = "Contents";
 
         private readonly ITestOutputHelper _testOutput;
         public IntegrationTest(ITestOutputHelper testOutput)
@@ -49,7 +48,7 @@ namespace Juice.Integrations.Tests
             {
                 CurrentDirectory = AppContext.BaseDirectory
             };
-            var schema = TestSchema1;
+            var schema = _testSchema1;
 
             resolver.ConfigureServices(services =>
             {
@@ -80,7 +79,7 @@ namespace Juice.Integrations.Tests
                 services
                     .AddIntegrationEventService()
                     .AddIntegrationEventLog()
-                    .RegisterContext<TestContext>(TestSchema1);
+                    .RegisterContext<TestContext>(_testSchema1);
 
                 services.RegisterRabbitMQEventBus(configuration.GetSection("RabbitMQ"));
 

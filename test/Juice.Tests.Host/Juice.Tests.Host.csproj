@@ -42,10 +42,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="8.0.8" />
-        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.*" Condition="'$(TargetFramework)' == 'net6.0'"/>
-        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.*" Condition="'$(TargetFramework)' == 'net8.0'"/>
-        <PackageReference Label="severity vulnerability fix" Include="System.Formats.Asn1" Version="8.0.1"/>
+        <PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="$(MicrosoftExtensionsVersion)" />
+        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="$(MicrosoftExtensionsVersion)"/>
     </ItemGroup>
 
 </Project>

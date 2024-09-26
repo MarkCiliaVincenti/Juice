@@ -110,7 +110,7 @@ namespace Juice.EF.Tests
 
             addedContent.Should().NotBeNull();
 
-            addedContent.CreatedDate.Should().NotBe(DateTimeOffset.MinValue);
+            addedContent!.CreatedDate.Should().NotBe(DateTimeOffset.MinValue);
 
             addedContent.Disable();
 
@@ -186,7 +186,7 @@ namespace Juice.EF.Tests
             var mediator = _serviceProvider.GetRequiredService<IMediator>();
             var dataEvent = DataEvents.Inserted.CreateDataEvent(typeof(DataInserted<>), typeof(Content), new AuditRecord("TestTable"));
 
-            await mediator.Publish(dataEvent).ConfigureAwait(false);
+            await mediator.Publish(dataEvent);
             await Task.Delay(1000);
         }
     }

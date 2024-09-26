@@ -4,13 +4,12 @@ namespace Juice.Modular
 {
     public static class TypeExtensions
     {
-        private static string GetDefaultName(Type type)
+        private static string? GetDefaultName(Type type)
         {
-            var ns = type.Namespace;
-            return ns.Replace('.', '_');
+            return type.Namespace?.Replace('.', '_');
         }
 
-        public static string GetFeatureName(this Type type)
+        public static string? GetFeatureName(this Type type)
         {
             return GetFeature(type)?.Name ?? GetDefaultName(type);
         }

@@ -7,7 +7,7 @@ namespace Juice.Extensions.Configuration
     public static class ConfigurationExtensions
     {
         /// <summary>
-        /// Get scalared config from configuration section then bind to type <see cref="T"/>
+        /// Get scalared config from configuration section then bind to type T/>
         /// <para>It support binding Dictionary&lt;,&gt; or other scalared type in to your T configuration</para>
         /// </summary>
         /// <typeparam name="T"></typeparam>

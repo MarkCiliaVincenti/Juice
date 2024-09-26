@@ -23,21 +23,21 @@ namespace Juice.Extensions.Options.Stores
                 }
             }
 
-            var jObject = JsonConvert.DeserializeObject<JObject>(await File.ReadAllTextAsync(physicalPath)) ?? new JObject();
+            JObject jObject = JsonConvert.DeserializeObject<JObject>(await File.ReadAllTextAsync(physicalPath)) ?? new JObject();
 
             var keys = section.Split(':');
             JObject jSection2 = jObject;
             foreach (var key in keys)
             {
 
-                if (jSection2.TryGetValue(key, out JToken section2) && section2 is JObject jObject2)
+                if (jSection2.TryGetValue(key, out var section2) && section2 is JObject jObject2)
                 {
                     jSection2 = jObject2;
                 }
                 else
                 {
                     jSection2[key] = new JObject();
-                    jSection2 = jSection2[key] as JObject;
+                    jSection2 = (JObject) jSection2[key]!;
                 }
             }
 

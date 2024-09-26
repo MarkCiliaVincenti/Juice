@@ -24,7 +24,7 @@ namespace Juice.Extensions.Configuration
                 {
                     FileProvider = FileProvider,
                     ReloadDelay = ReloadDelay,
-                    Path = System.IO.Path.Combine(dir ?? "", "tenants", Tenant.Identifier, file),
+                    Path = System.IO.Path.Combine(dir ?? "", "tenants", Tenant.Identifier!, file!),
                     Optional = Optional,
                     ReloadOnChange = ReloadOnChange
                 };

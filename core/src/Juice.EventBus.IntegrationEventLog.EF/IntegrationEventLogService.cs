@@ -14,14 +14,16 @@ namespace Juice.EventBus.IntegrationEventLog.EF
         {
             _eventTypes = eventTypes;
             _integrationEventLogContext = integrationEventLogContext;
-
-            var types = Assembly.Load(Assembly.GetEntryAssembly().FullName)
-                .GetTypes()
-                .Where(t => t.Name.EndsWith(nameof(IntegrationEvent)))
-                .ToList();
-            foreach (var type in types)
+            if (Assembly.GetEntryAssembly()?.FullName != null)
             {
-                _eventTypes.Register(type);
+                var types = Assembly.Load(Assembly.GetEntryAssembly()!.FullName!)
+                    .GetTypes()
+                    .Where(t => t.Name.EndsWith(nameof(IntegrationEvent)))
+                    .ToList();
+                foreach (var type in types)
+                {
+                    _eventTypes.Register(type);
+                }
             }
         }
 

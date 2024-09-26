@@ -54,10 +54,7 @@ namespace Juice.Core.Tests
         {
             var builder = WebApplication.CreateBuilder();
 
-            builder.Host.ConfigureAppConfiguration((app, config) =>
-            {
-                config.AddJsonFile($"appsettings.Separated.{app.HostingEnvironment.EnvironmentName}.json", true);
-            });
+            builder.Configuration.AddJsonFile($"appsettings.Separated.{builder.Environment.EnvironmentName}.json", true);
 
             var services = builder.Services;
             var configuration = builder.Configuration;

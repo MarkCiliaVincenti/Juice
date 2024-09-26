@@ -6,15 +6,15 @@ namespace Juice.Extensions
 {
     public static class EnumExtensions
     {
-        private static string LookupResource(Type resourceManagerProvider, string resourceKey)
+        private static string? LookupResource(Type resourceManagerProvider, string resourceKey)
         {
 
             foreach (var staticProperty in resourceManagerProvider.GetProperties(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
             {
                 if (staticProperty.PropertyType == typeof(System.Resources.ResourceManager))
                 {
-                    System.Resources.ResourceManager resourceManager = (System.Resources.ResourceManager)staticProperty.GetValue(null, null);
-                    return resourceManager.GetString(resourceKey);
+                    var resourceManager = (System.Resources.ResourceManager?)staticProperty.GetValue(default, default);
+                    return resourceManager?.GetString(resourceKey);
                 }
             }
 
@@ -30,15 +30,18 @@ namespace Juice.Extensions
         {
             //return "";
             var attr = value.GetCustomAttribute<DisplayAttribute>();
+            var name = attr?.Name;
+            if (!string.IsNullOrWhiteSpace(name)) { 
+                if (attr?.ResourceType != null)
+                {
+                    var resource = LookupResource(attr.ResourceType, name);
+                    if (!string.IsNullOrWhiteSpace(resource))
+                    {
+                        return resource;
+                    }
+                }
 
-            if (attr?.ResourceType != null)
-            {
-                return LookupResource(attr.ResourceType, attr.Name);
-            }
-
-            if (!string.IsNullOrWhiteSpace(attr?.Name))
-            {
-                return attr.Name;
+                return name;
             }
 
             return value.ToString();
@@ -73,8 +76,8 @@ namespace Juice.Extensions
         public static IEnumerable<TAttribute> GetCustomAttributes<TAttribute>(this Enum value) where TAttribute : Attribute
         {
             return value.GetType()
-                .GetField(value.ToString())
-                .GetCustomAttributes<TAttribute>();
+                .GetField(value.ToString())?
+                .GetCustomAttributes<TAttribute>() ?? [];
         }
 
         /// <summary>

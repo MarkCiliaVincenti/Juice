@@ -73,7 +73,7 @@ namespace Juice.EF
             {
                 _mediator = serviceProvider.GetService<IMediator>();
             }
-            catch (Exception ex)
+            catch
             {
             }
 

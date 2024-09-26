@@ -7,7 +7,7 @@ namespace Juice.MediatR.RequestManager.EF.SqlServer.Migrations
 {
     public partial class AddCompletedTime : Migration
     {
-        private readonly string? _schema;
+        private readonly string _schema;
 
         public AddCompletedTime() { }
 

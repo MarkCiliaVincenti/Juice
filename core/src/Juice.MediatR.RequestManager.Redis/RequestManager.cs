@@ -7,14 +7,11 @@ namespace Juice.MediatR.RequestManager.Redis
 {
     public class RequestManager : IRequestManager
     {
-        private static RedisOptions configuration;
+        private RedisOptions _configuration;
         /// <summary>  
         /// The lazy connection.  
         /// </summary>  
-        private Lazy<ConnectionMultiplexer> lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
-        {
-            return ConnectionMultiplexer.Connect(configuration.ConnectionString);
-        });
+        private Lazy<ConnectionMultiplexer> lazyConnection;
 
         /// <summary>  
         /// Gets the connection.  
@@ -26,7 +23,11 @@ namespace Juice.MediatR.RequestManager.Redis
         public RequestManager(ILogger<RequestManager> logger, IOptions<RedisOptions> options)
         {
             _logger = logger;
-            configuration = options.Value;
+            _configuration = options.Value;
+            lazyConnection = new Lazy<ConnectionMultiplexer>(() =>
+            {
+                return ConnectionMultiplexer.Connect(_configuration.ConnectionString);
+            });
         }
 
         private string GetKey<T>(Guid id)

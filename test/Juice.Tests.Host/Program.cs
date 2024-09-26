@@ -43,7 +43,7 @@ app.MapGet("/readcache", async (context) =>
     var cache = context.RequestServices.GetRequiredService<IDistributedCache>();
     var input = context.Request.Query["data"].ToString();
     var value = await cache.GetStringAsync("cachedKey");
-    await context.Response.WriteAsync(value);
+    await context.Response.WriteAsync(value??"(empty)");
 });
 
 app.Run();
@@ -52,7 +52,7 @@ app.Run();
 public record LogEvent : IntegrationEvent
 {
     public LogLevel Serverty { get; set; }
-    public string Facility { get; set; }
+    public required string Facility { get; set; }
 
     public override string GetEventKey() => (Facility + "." + Serverty).ToLower();
 }

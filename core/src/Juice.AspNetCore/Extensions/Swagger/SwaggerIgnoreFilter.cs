@@ -22,7 +22,7 @@ namespace Juice.Extensions.Swagger
                                          .ToArray();
 
             var keys = schema.Properties.Keys.Where(k => excludedProperties.Select(p => p.Name)
-                .Contains(k, new PropertyNameComparer()));
+                .Contains(k, StringComparer.OrdinalIgnoreCase));
 
             foreach (var key in keys)
             {
@@ -32,18 +32,5 @@ namespace Juice.Extensions.Swagger
         }
 
         #endregion
-    }
-
-    internal class PropertyNameComparer : IEqualityComparer<string>
-    {
-        public bool Equals(string x, string y)
-        {
-            return x.Equals(y, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public int GetHashCode(string obj)
-        {
-            return obj.GetHashCode();
-        }
     }
 }

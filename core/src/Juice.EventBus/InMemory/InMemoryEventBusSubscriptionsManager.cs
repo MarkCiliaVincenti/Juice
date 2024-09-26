@@ -74,7 +74,7 @@ namespace Juice.EventBus
         }
 
 
-        private void DoRemoveHandler(string eventName, SubscriptionInfo subsToRemove)
+        private void DoRemoveHandler(string eventName, SubscriptionInfo? subsToRemove)
         {
             if (subsToRemove != null)
             {
@@ -110,7 +110,7 @@ namespace Juice.EventBus
             handler?.Invoke(this, eventName);
         }
 
-        private SubscriptionInfo DoFindSubscriptionToRemove(string eventName, Type handlerType)
+        private SubscriptionInfo? DoFindSubscriptionToRemove(string eventName, Type handlerType)
         {
             if (!HasSubscriptionsForEvent(eventName))
             {
@@ -124,7 +124,7 @@ namespace Juice.EventBus
         public bool HasSubscriptionsForEvent(string eventName) => _handlers.ContainsKey(eventName)
             || (_topicSupported && _handlers.Keys.Any(key => RoutingKeyUtils.IsTopicMatch(eventName, key)));
 
-        public Type GetEventTypeByName(string eventName)
+        public Type? GetEventTypeByName(string eventName)
         {
             if (_eventTypes.ContainsKey(eventName))
             {

@@ -20,11 +20,12 @@ namespace Juice.Extensions.DependencyInjection
             }
         }
         private IServiceProvider? _serviceProvider;
-        public string CurrentDirectory { get; set; }
+        public string CurrentDirectory { get; init; }
 
         private IServiceCollection _services;
-        public DependencyResolver()
+        public DependencyResolver(string? currentDirectory = default)
         {
+            CurrentDirectory = currentDirectory ?? AppContext.BaseDirectory;
             // Set up Dependency Injection
             _services = new ServiceCollection();
             ConfigureServices(_services);

@@ -8,12 +8,14 @@ namespace Juice.EventBus.IntegrationEventLog.EF
         /// <summary>
         /// Parameterless constructor for EFCore binding
         /// </summary>
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         private IntegrationEventLogEntry() { }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         public IntegrationEventLogEntry(IntegrationEvent @event, Guid transactionId)
         {
             EventId = @event.Id;
             CreationTime = @event.CreationDate;
-            EventTypeName = @event.GetType().FullName;
+            EventTypeName = @event.GetType().FullName!;
             Content = JsonConvert.SerializeObject(@event);
             State = EventState.NotPublished;
             TimesSent = 0;
@@ -24,15 +26,19 @@ namespace Juice.EventBus.IntegrationEventLog.EF
         [NotMapped]
         public string EventTypeShortName => EventTypeName.Split('.').Last();
         [NotMapped]
-        public IntegrationEvent IntegrationEvent { get; private set; }
+        public IntegrationEvent? IntegrationEvent { get; private set; }
         public EventState State { get; set; }
         public int TimesSent { get; set; }
         public DateTime CreationTime { get; private set; }
         public string Content { get; private set; }
         public string TransactionId { get; private set; }
 
-        public IntegrationEventLogEntry DeserializeJsonContent(Type type)
+        public IntegrationEventLogEntry DeserializeJsonContent(Type? type)
         {
+            if(type == null)
+            {
+                return this;
+            }
             IntegrationEvent = JsonConvert.DeserializeObject(Content, type) as IntegrationEvent;
             return this;
         }

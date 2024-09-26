@@ -9,11 +9,11 @@
         /// <summary>
         /// Sort property
         /// </summary>
-        public string Property { get; set; }
+        public required string Property { get; init; }
         /// <summary>
         /// Sort direction
         /// </summary>
-        public SortDirection Direction { get; set; }
+        public SortDirection Direction { get; init; }
     }
 
 }

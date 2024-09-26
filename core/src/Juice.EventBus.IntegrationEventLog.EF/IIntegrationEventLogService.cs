@@ -48,8 +48,8 @@ namespace Juice.EventBus.IntegrationEventLog.EF
         where TContext : DbContext
     {
         /// <summary>
-        /// Ensure event log context has an associated connection with input <see cref="T"/> context.
-        /// <para>Throw <see cref="ArgumentException"/> if input context has not same type with <see cref="TContext"/></para>
+        /// Ensure event log context has an associated connection with input <c>T</c> context.
+        /// <para>Throw <see cref="ArgumentException"/> if input context has not same type with <c>TContext</c></para>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="context"></param>
