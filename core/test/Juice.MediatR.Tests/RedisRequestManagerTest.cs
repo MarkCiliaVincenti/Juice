@@ -24,6 +24,7 @@ namespace Juice.MediatR.Tests
         [Fact(DisplayName = "Manager should not be null")]
         public async Task Manager_should_not_be_nullAsync()
         {
+            await Task.CompletedTask;
             var resolver = new DependencyResolver
             {
                 CurrentDirectory = AppContext.BaseDirectory

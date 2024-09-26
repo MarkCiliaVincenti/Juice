@@ -15,8 +15,7 @@ namespace Juice.Extensions
         }
 
         /// <summary>
-        /// Get the value of the key as a string that is replaced the variables from the input options with
-        /// <see cref="replacementParamPattern"/>
+        /// Get the value of the key as a string that is replaced the variables from the input options with <c>replacementParamPattern</c>
         /// <example>For example:
         /// <code>
         ///     var dict = new Dictionary&lt;string, object&gt;{ { "basePath", "http://localhost"}, { "str", "$(basePath)/abc/xyz"} };<br/>
@@ -29,14 +28,13 @@ namespace Juice.Extensions
         /// <param name="key"></param>
         /// <param name="replacementParamPattern"></param>
         /// <returns>formatted string</returns>
-        public static string GetOptionAsString(this IDictionary<string, object?> options, string key, string replacementParamPattern = DefaultReplacementPattern)
+        public static string? GetOptionAsString(this IDictionary<string, object?> options, string key, string replacementParamPattern = DefaultReplacementPattern)
         {
             return options.GetOptionAsString(key, options, replacementParamPattern);
         }
 
         /// <summary>
-        /// Get the value of the key as a string that is replaced the variables from the input options with
-        /// <see cref="replacementParamPattern"/>
+        /// Get the value of the key as a string that is replaced the variables from the input options with <c>replacementParamPattern</c>
         ///<para>You can logging replacement process with Action&lt;string&gt; logging</para>
         /// <example>For example:
         /// <code>
@@ -52,7 +50,7 @@ namespace Juice.Extensions
         /// <param name="replacementParamPattern"></param>
         /// <param name="logging"></param>
         /// <returns>formatted string</returns>
-        public static string GetOptionAsString(this IDictionary<string, object?> options, string key, string replacementParamPattern, Action<string> logging)
+        public static string? GetOptionAsString(this IDictionary<string, object?> options, string key, string replacementParamPattern, Action<string> logging)
         {
             return options.GetOptionAsString(key, options, replacementParamPattern, logging);
         }
@@ -74,14 +72,13 @@ namespace Juice.Extensions
         /// <param name="key"></param>
         /// <param name="logging"></param>
         /// <returns>formatted string</returns>
-        public static string GetOptionAsString(this IDictionary<string, object?> options, string key, Action<string> logging)
+        public static string? GetOptionAsString(this IDictionary<string, object?> options, string key, Action<string> logging)
         {
             return options.GetOptionAsString(key, options, DefaultReplacementPattern, logging);
         }
 
         /// <summary>
-        /// Get the value of the key as a string that is replaced the variables from the input options or <see cref="referencedOptions"/> with
-        /// <see cref="replacementParamPattern"/>
+        /// Get the value of the key as a string that is replaced the variables from the input options or <c>replacementParamPattern</c> with <c>replacementParamPattern</c>
         ///<para>You can logging replacement process with Action&lt;string&gt; logging</para>
         /// <para>NOTE: This function alway find variables value in self dictionary before try to find in referenced dictionary</para>
         /// <example>For example:
@@ -101,13 +98,13 @@ namespace Juice.Extensions
         /// <param name="replacementParamPattern"></param>
         /// <param name="logging"></param>
         /// <returns></returns>
-        public static string GetOptionAsString(this IDictionary<string, object?> oc, string key, IDictionary<string, object?> referencedOptions, string replacementParamPattern = DefaultReplacementPattern, Action<string>? logging = null)
+        public static string? GetOptionAsString(this IDictionary<string, object?> oc, string key, IDictionary<string, object?> referencedOptions, string replacementParamPattern = DefaultReplacementPattern, Action<string>? logging = null)
         {
             var value = GetOption<string>(oc, key, null, referencedOptions);
             if (value != null && !string.IsNullOrEmpty(replacementParamPattern))
             {
                 var input = value.ToString();
-                MatchCollection matches = Regex.Matches(input, replacementParamPattern);
+                var matches = Regex.Matches(input, replacementParamPattern);
                 foreach (Match m in matches)
                 {
                     var paramName = m.Groups["name"].ToString();
@@ -135,7 +132,7 @@ namespace Juice.Extensions
 
         /// <summary>
         /// <see cref="GetOptionAsString(IDictionary{string, object}, string, IDictionary{string, object}, string, Action{string})"/> with <see cref="DefaultReplacementPattern"/><br/>
-        /// Get the value of the key as a string that is replaced the variables from the input options or <see cref="referencedOptions"/> with <see cref="DefaultReplacementPattern"/>
+        /// Get the value of the key as a string that is replaced the variables from the input options or <c>referencedOptions</c> with <see cref="DefaultReplacementPattern"/>
         /// <para>NOTE: This function alway find variables value in self dictionary before try to find in referenced dictionary</para>
         /// <example>For example:
         /// <code>
@@ -153,7 +150,7 @@ namespace Juice.Extensions
         /// <param name="referencedOptions"></param>
         /// <param name="logging"></param>
         /// <returns></returns>
-        public static string GetOptionAsString(this IDictionary<string, object?> oc, string key, IDictionary<string, object?> referencedOptions, Action<string>? logging = null)
+        public static string? GetOptionAsString(this IDictionary<string, object?> oc, string key, IDictionary<string, object?> referencedOptions, Action<string>? logging = null)
             => oc.GetOptionAsString(key, referencedOptions, DefaultReplacementPattern, logging);
 
         /// <summary>
@@ -181,16 +178,17 @@ namespace Juice.Extensions
         /// <returns></returns>
         public static T? GetOption<T>(this IDictionary<string, object?> options, string key, Func<object?, T>? converter = null, IDictionary<string, object?>? referencedOptions = null)
         {
-            var value = options.ContainsKey(key) ? options[key] : null;
-            if (value?.ToString() != null)
+            var value = options.TryGetValue(key, out var v) ? v : null;
+            var valString = value?.ToString();
+            if (valString != null)
             {
-                if (value.ToString().StartsWith("$") && !value.ToString().StartsWith("$("))
+                if (valString.StartsWith('$') && !valString.StartsWith("$("))
                 {
-                    return options.Match(value.ToString(), referencedOptions, converter);
+                    return options.Match(valString, referencedOptions, converter);
                 }
-                if (typeof(T) == typeof(string) && value != null && value.ToString().StartsWith("\\$"))
+                if (typeof(T) == typeof(string) && value != null && valString.StartsWith("\\$"))
                 {
-                    value = value.ToString().TrimStart('\\');
+                    value = valString.TrimStart('\\');
                 }
                 if (converter == null)
                 {
@@ -203,9 +201,9 @@ namespace Juice.Extensions
 
         private static T? Match<T>(this IDictionary<string, object?> options, string key, IDictionary<string, object?>? referencedOptions, Func<object?, T?>? converter = null)
         {
-            if (key.StartsWith("$") || key.Contains(".") || key.Contains("["))
+            if (key.StartsWith('$') || key.Contains('.') || key.Contains('['))
             {
-                object value = null;
+                object? value = null;
                 var isFirstKey = true;
                 foreach (Match m in Regex.Matches(key, @"([$\w\/\\]+)"))
                 {
@@ -213,7 +211,7 @@ namespace Juice.Extensions
                     {
                         isFirstKey = false;
                         var firstKey = m.Value;
-                        value = options.ContainsKey(firstKey) ? options[firstKey] : null;
+                        value = options.TryGetValue(firstKey, out var v) ? v : null;
                         if (value == null)
                         {
                             if (firstKey.ToString().StartsWith("$") && referencedOptions != null)
@@ -229,9 +227,9 @@ namespace Juice.Extensions
                                 return default(T);
                             }
                         }
-                        else if (value.ToString().StartsWith("$") && referencedOptions != null)
+                        else if (value.ToString()?.StartsWith("$") ?? false && referencedOptions != null)
                         {
-                            var val1 = GetOption<object>(referencedOptions, value.ToString());
+                            var val1 = GetOption<object>(referencedOptions!, value.ToString()!);
                             if (val1 != null)
                             {
                                 value = val1;
@@ -241,13 +239,14 @@ namespace Juice.Extensions
                     else
                     {
                         value = GetItemValue(value, m.Value);
-                        if (value == null)
+                        var valString = value?.ToString();
+                        if (valString == null)
                         {
                             return default(T);
                         }
-                        if (value is string && value.ToString().StartsWith("$") && referencedOptions != null)
+                        if (value is string && valString.StartsWith("$") && referencedOptions != null)
                         {
-                            var val1 = GetOption<object>(referencedOptions, value.ToString());
+                            var val1 = GetOption<object>(referencedOptions, valString);
                             if (val1 != null)
                             {
                                 value = val1;
@@ -271,25 +270,22 @@ namespace Juice.Extensions
         {
             if (value == null) { return default(T); }
             if (value is T t) { return t; }
-
+            var valString = value.ToString();
             if (typeof(T) == typeof(string))
             {
-                object obj = value.ToString();
-                return (T)(obj);
+                return (T?)(valString as object);
             }
             try
             {
                 if (typeof(T) == typeof(Guid))
                 {
-                    if (string.IsNullOrWhiteSpace(value.ToString())) { return (T)(object)Guid.Empty; }
-                    object guid = Guid.Parse(value.ToString());
-                    return (T)guid;
+                    if (string.IsNullOrWhiteSpace(valString)) { return default; }
+                    return Guid.TryParse(valString, out var guid) ? (T)(object)guid: default;
                 }
 
                 if (typeof(T).IsEnum)
                 {
-                    var e = Enum.Parse(typeof(T), value.ToString());
-                    return (T)e;
+                    return Enum.TryParse(typeof(T), valString, true, out var e) ? (T)e: default;
                 }
             }
             catch
@@ -305,20 +301,20 @@ namespace Juice.Extensions
 
         private static T? JsonConverter<T>(object? value)
         {
-            if (value == null) { return default(T); }
+            if (value == null) { return default; }
             var serialized = JsonConvert.SerializeObject(value);
-            if (string.IsNullOrWhiteSpace(serialized)) { return default(T); }
+            if (string.IsNullOrWhiteSpace(serialized)) { return default; }
             try
             {
                 return JsonConvert.DeserializeObject<T?>(serialized);
             }
             catch (Exception)
             {
-                return default(T);
+                return default;
             }
         }
 
-        private static object? GetItemValue(object myObject, object index)
+        private static object? GetItemValue(object? myObject, string index)
         {
             if (myObject == null)
             {
@@ -333,7 +329,7 @@ namespace Juice.Extensions
                 {
                     try
                     {
-                        int indexInt = int.Parse(index.ToString());
+                        int indexInt = int.Parse(index);
                         IList ilist = (IList)myObject;
                         return ilist[indexInt];
                     }
@@ -406,9 +402,11 @@ namespace Juice.Extensions
                     {
                         var val1 = options[kv.Key];
                         var val2 = other[kv.Key];
-                        if (val1 != null && val2 != null && typeof(IDictionary<string, object?>).IsAssignableFrom(val1.GetType()) && typeof(IDictionary<string, object?>).IsAssignableFrom(val2.GetType()))
+                        if (val1 != null && val2 != null
+                            && typeof(IDictionary<string, object?>).IsAssignableFrom(val1.GetType())
+                            && typeof(IDictionary<string, object?>).IsAssignableFrom(val2.GetType()))
                         {
-                            options[kv.Key] = ((IDictionary<string, object?>)options[kv.Key])?.MergeOptions(ignoreNull, (IDictionary<string, object?>)val2);
+                            options[kv.Key] = ((IDictionary<string, object?>)val1).MergeOptions(ignoreNull, (IDictionary<string, object?>)val2);
                         }
                         else if ((!ignoreNull || val2 != null) && (force || val1 == null || val1.ToString() == kv.Key))
                         {

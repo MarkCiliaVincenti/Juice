@@ -24,6 +24,10 @@ namespace Juice.Domain
     public abstract class AuditAggregrateRoot<TKey, TNotification> : AuditEntity<TKey>, IAggregateRoot<TNotification>, IValidatable
         where TKey : IEquatable<TKey>
     {
+        protected AuditAggregrateRoot(TKey id, string name) : base(id, name)
+        {
+        }
+
         [NotMapped]
         public IList<TNotification> DomainEvents { get; } = new List<TNotification>();
 

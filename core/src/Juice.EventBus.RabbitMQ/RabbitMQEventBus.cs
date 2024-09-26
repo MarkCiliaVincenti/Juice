@@ -139,6 +139,7 @@ namespace Juice.EventBus.RabbitMQ
             Logger.LogInformation("Creating RabbitMQ consumer channel. Broker: {Broker}.", BROKER_NAME);
 
             var channel = _persistentConnection.CreateModel();
+            if (channel == null) { return null; }
 
             channel.ExchangeDeclare(exchange: BROKER_NAME,
                                     type: _type);
@@ -183,6 +184,11 @@ namespace Juice.EventBus.RabbitMQ
                     }
 
                     var eventType = SubsManager.GetEventTypeByName(eventName);
+                    if (eventType == null)
+                    {
+                        Logger.LogWarning("Failed to get event type for event: {EventName}", eventName);
+                        return false;
+                    }
                     var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
 
                     var integrationEvent = JsonConvert.DeserializeObject(message, eventType);

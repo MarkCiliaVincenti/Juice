@@ -37,7 +37,7 @@ namespace Juice.Services
         {
             var sb = new StringBuilder();
             var random = new Random();
-            var chars = caseSenitive ? _encode32CaseSensitiveChars : _encode32Chars?.ToUpper();
+            var chars = caseSenitive ? _encode32CaseSensitiveChars : _encode32Chars.ToUpper();
             while (length-- > 0)
             {
                 var num = random.Next(chars.Length);

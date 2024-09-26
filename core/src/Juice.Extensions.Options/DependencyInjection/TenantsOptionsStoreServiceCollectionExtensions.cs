@@ -23,7 +23,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Save per-tenant options to tenants/[Tenant name]/[custome file.json] for specified <see cref="{T}"/>
+        /// Save per-tenant options to tenants/[Tenant name]/[custome file.json] for specified input type
         /// </summary>
         /// <param name="services"></param>
         /// <param name="file"></param>

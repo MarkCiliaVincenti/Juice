@@ -41,19 +41,22 @@ namespace Juice.Extensions.Options
             }
         }
 
-        public T Get(string name)
+        public T Get(string? name)
         {
+            if (name == null) {
+                return Value;
+            }
             if (_valueUpdated)
             {
                 return _updatedValue;
             }
             var options = _tenantsConfiguration
-                    .GetSection(name).Get<T>();
+                    .GetSection(name).Get<T>() ?? new();
             _configureOptions?.Invoke(options);
             return options;
         }
 
-        private T _updatedValue = default(T);
+        private T _updatedValue = new();
         private bool _valueUpdated = false;
         public async Task<bool> UpdateAsync(Action<T> applyChanges)
         {

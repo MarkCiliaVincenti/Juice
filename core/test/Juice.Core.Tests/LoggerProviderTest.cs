@@ -50,7 +50,7 @@ namespace Juice.Core.Tests
 
 
         [Fact(DisplayName = "Scopes should by logger")]
-        public async Task LogScope_should_by_loggerAsync()
+        public void LogScope_should_by_logger()
         {
             var resolver = new DependencyResolver
             {

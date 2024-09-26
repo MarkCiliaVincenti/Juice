@@ -24,7 +24,7 @@ namespace Juice.Core.Tests
 
 
         [Fact(DisplayName = "Biding a dictionary from appsettings")]
-        public async Task Config_should_write_Async()
+        public void Config_should_write()
         {
             var builder = new DependencyResolver();
             builder.ConfigureServices(services =>

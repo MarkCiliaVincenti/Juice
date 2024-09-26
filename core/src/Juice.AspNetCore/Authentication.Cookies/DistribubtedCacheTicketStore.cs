@@ -44,6 +44,7 @@ namespace Juice.AspNetCore.Authentication.Cookies
 
         public async Task RenewAsync(string key, AuthenticationTicket ticket)
         {
+            if(ticket.Principal.Identity == null) { return; }
             var start = DateTimeOffset.Now;
             var options = new DistributedCacheEntryOptions();
             var expiresUtc = ticket.Properties.ExpiresUtc;
@@ -64,7 +65,7 @@ namespace Juice.AspNetCore.Authentication.Cookies
 
         }
 
-        public async Task<AuthenticationTicket> RetrieveAsync(string key)
+        public async Task<AuthenticationTicket?> RetrieveAsync(string key)
         {
             var start = DateTimeOffset.Now;
             var ticketString = await _distributedCache.GetStringAsync(key);

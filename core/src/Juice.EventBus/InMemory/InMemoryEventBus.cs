@@ -1,5 +1,4 @@
-﻿using System.Net.Sockets;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Juice.EventBus
@@ -62,13 +61,19 @@ namespace Juice.EventBus
                     foreach (var subscription in subscriptions)
                     {
                         var handler = scope.ServiceProvider.GetService(subscription.HandlerType);
-                        if (handler == null) { continue; }
+                        if (handler == null) {
+                            Logger.LogWarning("Handler {HandlerType} was not registerd", subscription.HandlerType.Name);
+                            continue; }
                         var eventType = SubsManager.GetEventTypeByName(eventName);
+                        if (eventType == null) {
+                            Logger.LogWarning("Event type was not registerd for {EventName}", eventName);
+                            continue; }
                         try
                         {
                             var concreteType = typeof(IIntegrationEventHandler<>).MakeGenericType(eventType);
+                            var method = concreteType.GetMethod("HandleAsync")!;
                             // It worked but not sure if it's the best way to do it
-                            await (Task)concreteType.GetMethod("HandleAsync").Invoke(handler, new object[] { @event });
+                            await (Task)method.Invoke(handler, new object[] { @event })!;
                         }
                         catch (Exception ex)
                         {

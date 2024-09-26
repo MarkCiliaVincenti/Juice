@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Save options to [custome file.json] for specified <see cref="{T}"/>
+        /// Save options to [custome file.json] for specified input type/>
         /// </summary>
         /// <param name="services"></param>
         /// <param name="file"></param>

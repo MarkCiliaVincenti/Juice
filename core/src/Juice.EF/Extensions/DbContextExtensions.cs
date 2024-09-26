@@ -1,6 +1,5 @@
 ﻿using Juice.Domain;
 using Juice.Domain.Events;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -13,89 +12,7 @@ namespace Juice.EF.Extensions
 {
     public static class DbContextExtensions
     {
-        [Obsolete("This business has moved to the TrackingChanges method")]
-        public static void SetAuditInformation<TContext>(this TContext context, ILogger? logger = default)
-            where TContext : DbContext, IAuditableDbContext
-        {
-            return;
-            try
-            {
-                var addedEntities = context.ChangeTracker.Entries()
-                    .Where(entry => entry.State == EntityState.Added).ToList();
-                var user = context.User;
-
-                if (logger?.IsEnabled(LogLevel.Debug) ?? false)
-                {
-                    logger.LogDebug("[Audit] Found {count} Added entries", addedEntities.Count);
-                }
-
-                addedEntities.ForEach(entry =>
-                {
-                    if (entry.Entity is ICreationInfo)
-                    {
-                        if (user != null && entry.Property(nameof(ICreationInfo.CreatedUser)).CurrentValue == null)
-                        {
-                            entry.Property(nameof(ICreationInfo.CreatedUser)).CurrentValue = user;
-                        }
-                        entry.Property(nameof(ICreationInfo.CreatedDate)).CurrentValue = DateTimeOffset.Now;
-                    }
-                    if (entry.Entity is IModificationInfo)
-                    {
-                        entry.Property(nameof(IModificationInfo.ModifiedUser)).CurrentValue = user;
-                        entry.Property(nameof(IModificationInfo.ModifiedDate)).CurrentValue = DateTimeOffset.Now;
-                    }
-
-                    if (logger?.IsEnabled(LogLevel.Debug) ?? false)
-                    {
-                        logger.LogDebug("[Audit] Setted audit info for entry {entryId}", entry.Property("Id").CurrentValue ?? "");
-                    }
-                });
-
-
-                var editedEntities = context.ChangeTracker.Entries()
-                    .Where(entry => entry.State == EntityState.Modified).ToList();
-                if (logger?.IsEnabled(LogLevel.Debug) ?? false)
-                {
-                    logger.LogDebug("[Audit] Found {count} Modified entries", editedEntities.Count);
-                }
-                editedEntities.ForEach(entry =>
-                {
-                    if (entry.Entity is IRemovable removeInfo && entry.Property(nameof(IRemovable.IsRemoved)).IsModified)
-                    {
-                        if (removeInfo.IsRemoved)
-                        {
-                            entry.Property(nameof(IRemovable.RemovedUser)).CurrentValue = user;
-                            entry.Property(nameof(IRemovable.RemovedDate)).CurrentValue = DateTimeOffset.Now;
-                        }
-                        else
-                        {
-                            entry.Property(nameof(IRemovable.RestoredUser)).CurrentValue = user;
-                            entry.Property(nameof(IRemovable.RestoredDate)).CurrentValue = DateTimeOffset.Now;
-                        }
-                    }
-                    else if (entry.Entity is IModificationInfo)
-                    {
-                        entry.Property(nameof(IModificationInfo.ModifiedUser)).CurrentValue = user;
-                        entry.Property(nameof(IModificationInfo.ModifiedDate)).CurrentValue = DateTimeOffset.Now;
-                    }
-                    if (entry.Entity is ICreationInfo)
-                    {
-                        entry.Property(nameof(ICreationInfo.CreatedDate)).IsModified = false;
-                        entry.Property(nameof(ICreationInfo.CreatedUser)).IsModified = false;
-                    }
-                    if (logger?.IsEnabled(LogLevel.Debug) ?? false)
-                    {
-                        logger.LogDebug("[Audit] Setted audit info for entry {entryId}", entry.Property("Id").CurrentValue ?? "");
-                    }
-                });
-
-            }
-            catch (Exception ex)
-            {
-                logger?.LogWarning(ex, "[Audit] Failed to set audit info {trace}", ex.StackTrace);
-            }
-        }
-
+       
         public static void TrackingChanges<TContext>(this TContext context, ILogger? logger = default)
             where TContext : DbContext, IAuditableDbContext
         {

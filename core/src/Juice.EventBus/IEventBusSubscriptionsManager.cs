@@ -15,7 +15,12 @@
              where T : IntegrationEvent;
 
         bool HasSubscriptionsForEvent(string eventName);
-        Type GetEventTypeByName(string eventName);
+        /// <summary>
+        /// Return the registered event type by name
+        /// </summary>
+        /// <param name="eventName"></param>
+        /// <returns></returns>
+        Type? GetEventTypeByName(string eventName);
         void Clear();
         IEnumerable<SubscriptionInfo> GetHandlersForEvent(string eventName);
         string GetDefaultEventKey(Type type);

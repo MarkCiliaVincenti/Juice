@@ -12,7 +12,7 @@ namespace Juice.Extensions.Options
     {
         private readonly IOptionsMonitor<T> _options;
         private readonly string _section;
-        private readonly Action<T> _configureOptions;
+        private readonly Action<T>? _configureOptions;
         private readonly IOptionsMutableStore _store;
 
         public OptionsMutable(
@@ -28,12 +28,12 @@ namespace Juice.Extensions.Options
         public OptionsMutable(
             IServiceProvider provider,
             string section,
-            Action<T> configureOptions) : this(provider, section)
+            Action<T>? configureOptions) : this(provider, section)
         {
             _configureOptions = configureOptions;
         }
 
-        private T _updatedValue = default(T);
+        private T? _updatedValue;
         private bool _valueUpdated = false;
         public T Value
         {
@@ -41,31 +41,23 @@ namespace Juice.Extensions.Options
             {
                 if (_valueUpdated)
                 {
-                    return _updatedValue;
+                    return _updatedValue!;
                 }
                 var options = _options.CurrentValue;
                 _configureOptions?.Invoke(options);
                 return options;
             }
         }
-        public T Get(string name) => _options.Get(name);
+        public T Get(string? name) => _options.Get(name);
 
         public async Task<bool> UpdateAsync(Action<T> applyChanges)
         {
             try
             {
-                //if (_store is IOptionsMutableStore<T> storeT)
-                //{
-                //    _updatedValue = await storeT.UpdateAsync(_section, Value ?? new T(), applyChanges);
-                //}
-                //else
-                {
-                    var sectionObject = Value;
-                    applyChanges(sectionObject);
-                    await _store.UpdateAsync(_section, sectionObject);
-                    _updatedValue = sectionObject;
-                }
-
+                T sectionObject = Value;
+                applyChanges(sectionObject);
+                await _store.UpdateAsync(_section, sectionObject);
+                _updatedValue = sectionObject;
                 _valueUpdated = true;
 
                 return true;

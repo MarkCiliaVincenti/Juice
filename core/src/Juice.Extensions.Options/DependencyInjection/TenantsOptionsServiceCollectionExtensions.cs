@@ -16,7 +16,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
-        /// <param name="section"></param>
+        /// <param name="sectionKey"></param>
         /// <param name="configureOptions"></param>
 		public static void ConfigureTenantsOptionsMutable<T>(
             this IServiceCollection services,
@@ -40,7 +40,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="services"></param>
-        /// <param name="section"></param>
+        /// <param name="sectionKey"></param>
         /// <param name="configureOptions"></param>
         public static void ConfigureTenantsOptions<T>(this IServiceCollection services, string sectionKey,
             Action<T>? configureOptions = default

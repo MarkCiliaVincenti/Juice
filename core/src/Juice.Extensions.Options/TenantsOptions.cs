@@ -33,10 +33,14 @@ namespace Juice.Extensions.Options
             }
         }
 
-        public T Get(string name)
+        public T Get(string? name)
         {
+            if(name == null)
+            {
+                return Get(_section);
+            }
             var options = _tenantsConfiguration
-                    .GetSection(name).Get<T>();
+                    .GetSection(name).Get<T>() ?? new();
             _configureOptions?.Invoke(options);
             return options;
         }

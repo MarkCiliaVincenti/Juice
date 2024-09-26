@@ -1,4 +1,5 @@
-﻿using Juice.EF;
+﻿using Juice;
+using Juice.EF;
 using Juice.EF.Migrations;
 using Juice.MediatR;
 using Juice.MediatR.RequestManager.EF;
@@ -33,6 +34,10 @@ namespace Microsoft.Extensions.DependencyInjection
             var provider = dbOptions.DatabaseProvider;
             var schema = dbOptions.Schema;
             var connectionName = dbOptions.ConnectionName;
+            if (string.IsNullOrEmpty(connectionName))
+            {
+                throw new ArgumentNullException(nameof(connectionName));
+            }
 
             services.AddDbContext<ClientRequestContext>(options =>
             {
@@ -96,6 +101,11 @@ namespace Microsoft.Extensions.DependencyInjection
             var provider = dbOptions.DatabaseProvider;
             var schema = dbOptions.Schema;
             var connectionName = dbOptions.ConnectionName;
+
+            if (string.IsNullOrEmpty(connectionName))
+            {
+                throw new ArgumentNullException(nameof(connectionName));
+            }
 
             services.AddDbContext<ClientRequestContext<T>>(options =>
             {

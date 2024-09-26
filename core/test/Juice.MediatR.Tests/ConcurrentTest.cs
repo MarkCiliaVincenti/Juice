@@ -59,7 +59,7 @@ namespace Juice.MediatR.Tests
 
             using var scope1 = resolver.ServiceProvider.CreateScope();
             var mediator = scope1.ServiceProvider.GetRequiredService<IMediator>();
-            mediator.Publish(new NoticeA());
+            var _ = mediator.Publish(new NoticeA());
             _testOutput.WriteLine("Single task is started");
 
             Parallel.For(0, 10, async i => await mediator.Publish(new NoticeA()));

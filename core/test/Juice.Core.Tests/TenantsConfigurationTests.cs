@@ -28,7 +28,7 @@ namespace Juice.Core.Tests
 
 
         [Fact(DisplayName = "Read config from tenant appsettings"), TestPriority(1)]
-        public async Task Config_should_read_from_tenant_Async()
+        public void Config_should_read_from_tenant()
         {
             using IHost host = Host.CreateDefaultBuilder()
                 .ConfigureAppConfiguration((hostContext, configApp) =>

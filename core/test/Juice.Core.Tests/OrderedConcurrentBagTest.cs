@@ -76,7 +76,9 @@ namespace Juice.Core.Tests
             var clock = new Stopwatch();
             clock.Start();
             // Wait for all tasks to complete
-            Task.WaitAll(bagAddTasks.ToArray());
+#pragma warning disable xUnit1031 // Do not use blocking task operations in test method
+            Task.WaitAll([.. bagAddTasks]);
+#pragma warning restore xUnit1031 // Do not use blocking task operations in test method
 
             _output.WriteLine("Adding items took {0}ms", clock.ElapsedMilliseconds);
 

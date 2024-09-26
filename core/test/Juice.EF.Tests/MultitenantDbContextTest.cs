@@ -5,6 +5,7 @@ using FluentAssertions;
 using Juice.Domain;
 using Juice.EF.Tests.Infrastructure;
 using Juice.Extensions.DependencyInjection;
+using Juice.Models;
 using Juice.MultiTenant;
 using Juice.XUnit;
 using Microsoft.EntityFrameworkCore;
@@ -83,10 +84,11 @@ namespace Juice.EF.Tests
 
     }
 
-    internal class TenantInfo : DynamicEntity<string>, ITenant, ITenantInfo
+    internal class TenantInfo : DynamicModel, ITenant, ITenantInfo
     {
+        public string? Id { get; set; }
+        public string? Name { get; set; }
         public string? Identifier { get; set; }
-
         public string? OwnerUser { get; set; }
     }
 }

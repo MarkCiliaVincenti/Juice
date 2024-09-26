@@ -36,7 +36,7 @@ namespace Juice.Extensions.Logging
             }
         }
 
-        public IDisposable BeginScope<TState>(TState state)
+        public IDisposable? BeginScope<TState>(TState state) where TState: notnull
         {
             var scope = BeginScopeInternal(state);
             Provider.ScopeStarted(Category, state, _scopeProvider);

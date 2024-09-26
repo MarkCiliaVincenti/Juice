@@ -13,26 +13,21 @@ namespace Juice.Integrations.MediatR.Behaviors
         {
             _logger = logger;
         }
-        public async Task<TResponse?> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             var typeName = request.GetGenericTypeName();
             try
             {
-                var result = await next();
+                TResponse result = await next();
 
-                if (result != null && !result.Succeeded)
+                if (!result.Succeeded)
                 {
                     _logger.LogError("Command {typeName} {request} not success. {message}", typeName, request?.ToString() ?? "", result.Message);
                     if (_logger.IsEnabled(LogLevel.Debug) && result.Exception != null)
                     {
                         _logger.LogDebug(result.Exception.StackTrace);
                     }
-                }
-                else if (result == null)
-                {
-                    _logger.LogError("Command {typeName} {request} return invalid result", typeName, request?.ToString() ?? "");
-                }
-                else if (_logger.IsEnabled(LogLevel.Debug))
+                }if (_logger.IsEnabled(LogLevel.Debug))
                 {
                     _logger.LogDebug("Command {typeName} {request} return Succeeded state", typeName, request?.ToString() ?? "");
                 }
@@ -42,7 +37,11 @@ namespace Juice.Integrations.MediatR.Behaviors
             {
                 _logger.LogError("ERROR Handling command {typeName} {request}. {message}", typeName, request?.ToString() ?? "", ex.Message);
                 _logger.LogTrace("ERROR Handling command {typeName}. Trace: {trace}", typeName, ex.StackTrace);
-                return OperationResult.Failed(ex, $"Failed to handle command {typeName}. {ex.Message}") is TResponse response ? response : default;
+                if (typeof(TResponse).IsAssignableTo(typeof(IOperationResult)))
+                {
+                    return (TResponse) OperationResult.Failed(ex, $"Failed to handle command {typeName}. {ex.Message}");
+                }
+                throw;
             }
         }
 

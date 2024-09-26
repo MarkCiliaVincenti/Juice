@@ -12,7 +12,7 @@ namespace Juice.Core.Tests
             var type = typeof(AFeature);
             var feature = type.GetFeature();
             feature.Should().NotBeNull();
-            feature.Name.Should().Be("A");
+            feature!.Name.Should().Be("A");
         }
     }
 
