@@ -35,7 +35,7 @@ namespace Juice.Extensions.Configuration
             {
                 FileProvider = FileProvider,
                 ReloadDelay = ReloadDelay,
-                Path = Path,
+                Path = Path!,
                 Optional = Optional,
                 ReloadOnChange = ReloadOnChange
             });

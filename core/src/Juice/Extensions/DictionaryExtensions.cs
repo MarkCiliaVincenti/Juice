@@ -50,7 +50,7 @@ namespace Juice.Extensions
         /// <param name="replacementParamPattern"></param>
         /// <param name="logging"></param>
         /// <returns>formatted string</returns>
-        public static string? GetOptionAsString(this IDictionary<string, object?> options, string key, string replacementParamPattern, Action<string> logging)
+        public static string? GetOptionAsString(this IDictionary<string, object?> options, string key, string replacementParamPattern, Action<string>? logging)
         {
             return options.GetOptionAsString(key, options, replacementParamPattern, logging);
         }
@@ -72,11 +72,11 @@ namespace Juice.Extensions
         /// <param name="key"></param>
         /// <param name="logging"></param>
         /// <returns>formatted string</returns>
-        public static string? GetOptionAsString(this IDictionary<string, object?> options, string key, Action<string> logging)
+        public static string? GetOptionAsString(this IDictionary<string, object?> options, string key, Action<string>? logging)
         {
             return options.GetOptionAsString(key, options, DefaultReplacementPattern, logging);
         }
-
+        
         /// <summary>
         /// Get the value of the key as a string that is replaced the variables from the input options or <c>replacementParamPattern</c> with <c>replacementParamPattern</c>
         ///<para>You can logging replacement process with Action&lt;string&gt; logging</para>
@@ -154,7 +154,7 @@ namespace Juice.Extensions
             => oc.GetOptionAsString(key, referencedOptions, DefaultReplacementPattern, logging);
 
         /// <summary>
-        /// Get the value of the key as <see cref="T"/> type
+        /// Get the value of the key as specified type
         /// <para>If the value is starts with $ but not $( then we will try to find it as key in self-dict or reference dict</para>
         /// <para>Support access object field or array element with . and [] pattern</para>
         /// <example><code>

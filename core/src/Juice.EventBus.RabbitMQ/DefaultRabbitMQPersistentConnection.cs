@@ -132,7 +132,7 @@ namespace Juice.EventBus.RabbitMQ
 
                 if (IsConnected)
                 {
-                    _connection.ConnectionShutdown += OnConnectionShutdown;
+                    _connection!.ConnectionShutdown += OnConnectionShutdown;
                     _connection.CallbackException += OnCallbackException;
                     _connection.ConnectionBlocked += OnConnectionBlocked;
 
@@ -149,7 +149,7 @@ namespace Juice.EventBus.RabbitMQ
             }
         }
 
-        private void OnConnectionBlocked(object sender, ConnectionBlockedEventArgs e)
+        private void OnConnectionBlocked(object? sender, ConnectionBlockedEventArgs e)
         {
             if (_disposed) { return; }
 
@@ -158,7 +158,7 @@ namespace Juice.EventBus.RabbitMQ
             TryConnect();
         }
 
-        private void OnCallbackException(object sender, CallbackExceptionEventArgs e)
+        private void OnCallbackException(object? sender, CallbackExceptionEventArgs e)
         {
             if (_disposed) { return; }
 
@@ -167,7 +167,7 @@ namespace Juice.EventBus.RabbitMQ
             TryConnect();
         }
 
-        private void OnConnectionShutdown(object sender, ShutdownEventArgs reason)
+        private void OnConnectionShutdown(object? sender, ShutdownEventArgs reason)
         {
             if (_disposed || _disposing) { return; }
 

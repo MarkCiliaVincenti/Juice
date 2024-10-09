@@ -53,6 +53,12 @@ namespace Juice.Integrations.EventBus
                 try
                 {
                     await _eventLogService.MarkEventAsInProgressAsync(logEvt.EventId);
+                    if(logEvt.IntegrationEvent is null)
+                    {
+                        _logger.LogError("Integration event is null. EventId: {IntegrationEventId}", logEvt.EventId);
+                        await _eventLogService.MarkEventAsFailedAsync(logEvt.EventId);
+                        continue;
+                    }
                     await _eventBus.PublishAsync(logEvt.IntegrationEvent);
                     await _eventLogService.MarkEventAsPublishedAsync(logEvt.EventId);
                 }

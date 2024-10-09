@@ -197,7 +197,7 @@ namespace Juice.EF
             _mediator = null;
             _logger = null;
             _pendingRefreshEntities.Clear();
-            PendingAuditEntries = null;
+            PendingAuditEntries.Clear();
         }
 
     }

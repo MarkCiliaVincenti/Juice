@@ -23,15 +23,19 @@ namespace Juice.EF.Migrations
         public override Migration CreateMigration(TypeInfo migrationClass,
               string activeProvider)
         {
-            if (activeProvider == null)
-                throw new ArgumentNullException(nameof(activeProvider));
+            ArgumentNullException.ThrowIfNull(activeProvider);
 
             var hasCtorWithSchema = migrationClass
                     .GetConstructor(new[] { typeof(ISchemaDbContext) }) != null;
 
             if (hasCtorWithSchema && _context is ISchemaDbContext schema)
             {
-                var instance = (Migration)Activator.CreateInstance(migrationClass.AsType(), schema);
+                var instance = (Migration?)Activator.CreateInstance(migrationClass.AsType(), schema);
+                if (instance == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Could not create an instance of {migrationClass.FullName}");
+                }
                 instance.ActiveProvider = activeProvider;
                 return instance;
             }

@@ -274,6 +274,7 @@ namespace Juice.EventBus.RabbitMQ
         #region Publish outgoing event
         public override async Task PublishAsync(IntegrationEvent @event)
         {
+            await Task.Yield();
             if (@event == null)
             {
                 throw new ArgumentNullException("@event");
@@ -303,6 +304,8 @@ namespace Juice.EventBus.RabbitMQ
                 {
                     Logger.LogTrace("Declaring RabbitMQ exchange to publish event: {EventId}", @event.Id);
                 }
+
+                if (channel == null) { return; }
 
                 channel.ExchangeDeclare(exchange: BROKER_NAME, type: _type);
 

@@ -6,7 +6,7 @@ namespace Juice.Extensions.Options
     public interface IOptionsMutable<out T> : IOptionsSnapshot<T> where T : class, new()
     {
         /// <summary>
-        /// Update <see cref="T"/> field by field
+        /// Update options field by field
         /// </summary>
         /// <param name="applyChanges"></param>
         /// <returns></returns>

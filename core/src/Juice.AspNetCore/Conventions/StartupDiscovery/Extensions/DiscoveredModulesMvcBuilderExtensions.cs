@@ -115,6 +115,7 @@ namespace Juice.Conventions.StartupDiscovery.Extensions
                 var feature = type.GetFeature();
 
                 if (
+                    featureName != null &&
                     (enabled.Any(f => f.Equals(featureName, StringComparison.OrdinalIgnoreCase))
                     || requirements.Any(f => f.Equals(featureName, StringComparison.OrdinalIgnoreCase))
                     || feature != null && feature.Required

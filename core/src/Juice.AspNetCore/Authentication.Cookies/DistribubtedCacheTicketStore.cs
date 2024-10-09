@@ -44,7 +44,7 @@ namespace Juice.AspNetCore.Authentication.Cookies
 
         public async Task RenewAsync(string key, AuthenticationTicket ticket)
         {
-            if(ticket.Principal.Identity == null) { return; }
+            if (ticket.Principal.Identity == null) { return; }
             var start = DateTimeOffset.Now;
             var options = new DistributedCacheEntryOptions();
             var expiresUtc = ticket.Properties.ExpiresUtc;
@@ -72,13 +72,13 @@ namespace Juice.AspNetCore.Authentication.Cookies
 
             var rs = ticketString != null ? Formatter.Unprotect(ticketString) : null;
 
-            if (_logger.IsEnabled(LogLevel.Debug) && ticketString != null && ASCIIEncoding.Unicode.GetByteCount(ticketString) > 500000)
+            if (_logger.IsEnabled(LogLevel.Debug) && rs != null && ticketString != null && ASCIIEncoding.Unicode.GetByteCount(ticketString) > 500000)
             {
                 try
                 {
                     _logger.LogDebug($"[TicketStore][AuthenticationTicketFactory][BigSize] {JsonConvert.SerializeObject(rs.Properties)}");
                 }
-                catch (Exception ex)
+                catch
                 {
                     _logger.LogDebug($"[TicketStore][AuthenticationTicketFactory][BigSize] Cannot serialize ticket object");
                 }
@@ -87,18 +87,16 @@ namespace Juice.AspNetCore.Authentication.Cookies
                     var s = JsonConvert.SerializeObject(rs.Principal.Identities);
                     _logger.LogDebug($"[TicketStore][AuthenticationTicketFactory][BigSize2] {s} {ASCIIEncoding.Unicode.GetByteCount(s)}");
                 }
-                catch (Exception ex)
+                catch
                 {
                     _logger.LogDebug($"[TicketStore][AuthenticationTicketFactory][BigSize2] Cannot serialize ticket object");
                 }
                 try
                 {
-                    //var s = JsonConvert.SerializeObject(rs.Principal.Claims);
                     _logger.LogDebug($"[TicketStore][AuthenticationTicketFactory][BigSize3] {rs.Principal.Claims.Count()}");
                 }
-                catch (Exception ex)
+                catch 
                 {
-                    _logger.LogDebug($"[TicketStore][AuthenticationTicketFactory][BigSize3] Cannot serialize ticket object");
                 }
             }
             return rs;

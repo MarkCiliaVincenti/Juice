@@ -20,7 +20,7 @@ namespace Juice.Extensions.Configuration
             return JsonConvert.DeserializeObject<T>(json);
         }
 
-        private static ExpandoObject GetExpandoObject(IConfigurationSection config, string settingName = null)
+        private static ExpandoObject GetExpandoObject(IConfigurationSection config, string? settingName = null)
         {
             settingName = settingName ?? config.Path;
             var result = new ExpandoObject();
@@ -32,12 +32,17 @@ namespace Juice.Extensions.Configuration
             foreach (var kvp in configs)
             {
                 var parent = result as IDictionary<string, object>;
+                
                 var path = kvp.Key.Substring(settingName?.Length ?? 0).Split(':');
 
                 // create or retrieve the hierarchy (keep last path item for later)
                 var i = 0;
                 for (i = 0; i < path.Length - 1; i++)
                 {
+                    if (parent == null)
+                    {
+                        break;
+                    }
                     if (path[i] == "") { continue; }
                     if (!parent.ContainsKey(path[i]))
                     {
@@ -45,13 +50,17 @@ namespace Juice.Extensions.Configuration
                     }
 
                     parent = parent[path[i]] as IDictionary<string, object>;
+                    
                 }
 
                 if (kvp.Value == null)
                 {
                     continue;
                 }
-
+                if (parent == null)
+                {
+                    continue;
+                }
                 // add the value to the parent
                 // note: in case of an array, key will be an integer and will be dealt with later
                 var key = path[i];
@@ -63,9 +72,9 @@ namespace Juice.Extensions.Configuration
             return result;
         }
 
-        private static void ReplaceWithArray(ExpandoObject parent, string key, ExpandoObject input)
+        private static void ReplaceWithArray(ExpandoObject? parent, string? key, ExpandoObject? input)
         {
-            if (input == null)
+            if (input == null || parent == null || key == null)
             {
                 return;
             }

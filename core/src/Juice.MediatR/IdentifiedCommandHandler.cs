@@ -163,7 +163,8 @@ namespace Juice.MediatR
         /// This method handles the command. It just ensures that no other request exists with the same ID, and if this is the case
         /// just enqueues the original inner command.
         /// </summary>
-        /// <param name="message">IdentifiedCommand which contains both original command & request ID</param>
+        /// <param name="message">IdentifiedCommand which contains both original command and request ID</param>
+        /// <param name="cancellationToken"></param>
         /// <returns>Return value of inner command or default value if request same ID was found</returns>
         public async Task<TResponse> Handle(IdentifiedCommand<TRequest, TResponse> message, CancellationToken cancellationToken)
         {

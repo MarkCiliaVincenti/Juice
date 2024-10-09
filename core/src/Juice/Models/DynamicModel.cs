@@ -139,7 +139,7 @@ namespace Juice.Models
             // If the property name is found in a dictionary,
             // set the result parameter to the property value and return true.
             // Otherwise, return false.
-            result = GetProperty<object>(() => null, binder.Name);
+            result = GetProperty<object?>(default, binder.Name);
             return true;
         }
 
