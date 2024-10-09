@@ -86,9 +86,9 @@ namespace Juice.EF
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            ConfigureModel(modelBuilder);
             modelBuilder.ConfigureDynamicExpandableEntities(this);
             modelBuilder.ConfigureAuditableEntities();
-            ConfigureModel(modelBuilder);
         }
 
 

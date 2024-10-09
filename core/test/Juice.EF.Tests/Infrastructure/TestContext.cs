@@ -11,7 +11,7 @@ namespace Juice.EF.Tests.Infrastructure
     public class TestContext : MultiTenantDbContext
     {
         public const string SCHEMA = "Contents";
-        public DbSet<Content> Contents { get; set; }
+        //public DbSet<Content> Contents { get; set; }
 
         public TestContext(IServiceProvider serviceProvider, DbContextOptions<TestContext> options) : base(options)
         {
@@ -24,8 +24,8 @@ namespace Juice.EF.Tests.Infrastructure
             {
                 entity.ToTable(nameof(Content), SCHEMA);
 
-                entity.IsDynamicExpandable(this);
-                entity.IsAuditable();
+                //entity.IsDynamicExpandable(this);
+                //entity.IsAuditable();
 
                 entity.Property(m => m.Code).HasMaxLength(Constants.NameLength);
 

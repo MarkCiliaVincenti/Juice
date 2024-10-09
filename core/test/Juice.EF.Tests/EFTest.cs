@@ -83,7 +83,7 @@ namespace Juice.EF.Tests
 
             dbContext.MigrateAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
-            var content = await dbContext.Contents.FirstOrDefaultAsync().ConfigureAwait(false);
+            var content = await dbContext.Set<Content>().FirstOrDefaultAsync().ConfigureAwait(false);
 
         }
 
@@ -106,7 +106,7 @@ namespace Juice.EF.Tests
 
             _logger.LogInformation("Content {code} was added", code1);
 
-            var addedContent = await dbContext.Contents.FirstOrDefaultAsync(c => c.Code == code1);
+            var addedContent = await dbContext.Set<Content>().FirstOrDefaultAsync(c => c.Code == code1);
 
             addedContent.Should().NotBeNull();
 
@@ -157,7 +157,7 @@ namespace Juice.EF.Tests
             Assert.Contains(typeof(DataEventHandler<DataInserted<Content>>).Name, sharedService.Handlers);
 
             sharedService.Handlers.Clear();
-            var addedContent = await dbContext.Contents.FirstOrDefaultAsync(c => c.Code.Equals(code1));
+            var addedContent = await dbContext.Set<Content>().FirstOrDefaultAsync(c => c.Code.Equals(code1));
 
             Assert.NotNull(addedContent);
 
@@ -173,9 +173,10 @@ namespace Juice.EF.Tests
             Assert.DoesNotContain(typeof(ContentDataEventHandler).Name, sharedService.Handlers);
             Assert.Contains(typeof(AuditEventHandler<AuditEvent<Content>>).Name, sharedService.Handlers);
             Assert.Contains(typeof(DataEventHandler<DataInserted<Content>>).Name, sharedService.Handlers);
-            var editedContent = await dbContext.Contents.FirstOrDefaultAsync(c => c.Code.Equals(code1));
+            var editedContent = await dbContext.Set<Content>().FirstOrDefaultAsync(c => c.Code.Equals(code1));
 
-            Assert.Equal("New value", addedContent[property]);
+            editedContent.Should().NotBeNull();
+            Assert.Equal("New value", editedContent![property]);
 
             await Task.Delay(1000);
         }
